@@ -10,6 +10,9 @@ namespace RoboLab
     public class AdvancedRobot : Robot
     {
         private Action currentAction;
+
+        public event ActionCompletedEventHandler ActionCompleted;
+
         public AdvancedRobot()
         {
             this.ActionCompleted += AdvancedRobot_ActionCompleted;

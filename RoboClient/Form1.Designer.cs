@@ -40,7 +40,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.portText = new System.Windows.Forms.TextBox();
             this.ipText = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.connectButton = new System.Windows.Forms.Button();
             this.msgField = new System.Windows.Forms.TextBox();
             this.logText = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
@@ -100,7 +100,7 @@
             this.serverPanel.Controls.Add(this.label1);
             this.serverPanel.Controls.Add(this.portText);
             this.serverPanel.Controls.Add(this.ipText);
-            this.serverPanel.Controls.Add(this.button1);
+            this.serverPanel.Controls.Add(this.connectButton);
             this.serverPanel.Enabled = false;
             this.serverPanel.Location = new System.Drawing.Point(425, 43);
             this.serverPanel.Name = "serverPanel";
@@ -158,14 +158,15 @@
             this.ipText.TabIndex = 0;
             this.ipText.Text = "127.0.0.1";
             // 
-            // button1
+            // connectButton
             // 
-            this.button1.Location = new System.Drawing.Point(12, 94);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(186, 30);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Соединение";
-            this.button1.UseVisualStyleBackColor = true;
+            this.connectButton.Location = new System.Drawing.Point(12, 94);
+            this.connectButton.Name = "connectButton";
+            this.connectButton.Size = new System.Drawing.Size(186, 30);
+            this.connectButton.TabIndex = 0;
+            this.connectButton.Text = "Соединение";
+            this.connectButton.UseVisualStyleBackColor = true;
+            this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
             // 
             // msgField
             // 
@@ -218,6 +219,7 @@
             this.MinimumSize = new System.Drawing.Size(590, 250);
             this.Name = "Form1";
             this.Text = "RoboClient";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.serverPanel.ResumeLayout(false);
             this.serverPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -239,7 +241,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox portText;
         private System.Windows.Forms.TextBox ipText;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button connectButton;
         private System.Windows.Forms.TextBox msgField;
         private System.Windows.Forms.TextBox logText;
         private System.Windows.Forms.Button button2;

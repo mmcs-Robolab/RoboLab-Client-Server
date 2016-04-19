@@ -6,24 +6,22 @@ using System.Threading.Tasks;
 
 namespace RoboLab
 {
-
-    public abstract class BaseRobot
+    
+    public abstract class BaseRobot : MarshalByRefObject
     {
         public event SensorUpdateEventHandler SensorUpdate;
-
-        public event ActionCompletedEventHandler ActionCompleted;
 
         /// <summary>
         /// Команда "идти вперед"
         /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public abstract void MoveForward(double distance);
+        /// <param name="speed">Скорость движения</param>
+        public abstract void BeginMoveForward(double speed);
 
         /// <summary>
         /// Команда "идти назад"
         /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public abstract void MoveBackward(double distance);
+        /// <param name="speed">Скорость движения</param>
+        public abstract void BeginMoveBackward(double speed);
 
         /// <summary>
         /// Остановка всех текущих действий
@@ -33,39 +31,27 @@ namespace RoboLab
         /// <summary>
         /// Команда "повернуть налево"
         /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public abstract void TurnLeft(double angle);
+        /// <param name="speed">Скорость поворота</param>
+        public abstract void BeginTurnLeft(double speed);
 
         /// <summary>
         /// Команда "повернуть направо"
         /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public abstract void TurnRight(double angle);
-
-        
-        /// <summary>
-        /// Асинхронная команда "идти вперед"
-        /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public abstract void StartMoveForward(double distance);
+        /// <param name="speed">Скорость поворота</param>
+        public abstract void BeginTurnRight(double speed);
 
         /// <summary>
-        /// Асинхронная команда "идти назад"
+        /// Получить список установленных на роботе сенсоров
         /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public abstract void StartMoveBackward(double distance);
+        /// <returns></returns>
+        public virtual SensorType[] GetSupportedSensors()
+        {
+            return new SensorType[] { };
+        }
 
-        /// <summary>
-        /// Асинхронная команда "повернуть налево"
-        /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public abstract void StartTurnLeft(double angle);
+        public abstract void BeginGetSensorValue(SensorType type);
 
-        /// <summary>
-        /// Асинхронная команда "повернуть направо"
-        /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public abstract void StartTurnRight(double angle);
+        public abstract double[] GetSensorValue(SensorType type);
 
         /// <summary>
         /// Специальное действие
@@ -85,12 +71,19 @@ namespace RoboLab
             return new string[] { };
         }
 
-        
+        /// <summary>
+        /// Метод вызова события получения данных с сенсоров
+        /// </summary>
+        protected void onSensorUpdate(SensorUpdateEventArgs e)
+        {
+            if (this.SensorUpdate != null)
+                this.SensorUpdate(this, e);
+        }
     }
 
     //TODO: Добавить еще видов сенсоров
-    public enum SensorType { LaserScanner }
-    
+    public enum SensorType { LaserScanner, Odometry }
+    [Serializable]
     public class SensorUpdateEventArgs : EventArgs
     {
         public SensorType Type { get; set; }
@@ -103,13 +96,14 @@ namespace RoboLab
     }
 
     public delegate void SensorUpdateEventHandler(object sender, SensorUpdateEventArgs args);
-
+    [Serializable]
     public abstract class Action
     {
         public string Name { get; protected set; }
         
     }
     public enum MovementType { Forward, Backward, TurnLeft, TurnRight }
+    [Serializable]
     public class MovementAction : Action
     {
         public MovementType Type { get; private set; }
@@ -134,7 +128,7 @@ namespace RoboLab
             Amount = amount;
         }
     }
-
+    [Serializable]
     public class SpecialAction : Action
     {
         public object Param { get; private set; }
@@ -144,6 +138,7 @@ namespace RoboLab
             Param = param;
         }
     }
+    [Serializable]
     public class ActionCompletedEventArgs : EventArgs
     {
         public Action Action { get; set; }
@@ -154,4 +149,6 @@ namespace RoboLab
     }
 
     public delegate void ActionCompletedEventHandler(object sender, ActionCompletedEventArgs args);
+
+    
 }

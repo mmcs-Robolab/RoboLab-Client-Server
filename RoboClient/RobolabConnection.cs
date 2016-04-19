@@ -33,8 +33,10 @@ namespace RoboClient
         //private List<Device> deviceList;
         public delegate void ConnectionEventHandler(Object sender, EventArgs e);
         public event ConnectionEventHandler Connected;
+        public event ConnectionEventHandler ConnectFailed;
         public event ConnectionEventHandler Disconnected;
         public event ConnectionEventHandler Authorised;
+        public event ConnectionEventHandler AuthoriseFailed;
 
         public delegate void DataReceivedEventHandler(Object sender, DataReceivedEventArgs e);
         public event DataReceivedEventHandler DataReceived;
@@ -50,6 +52,12 @@ namespace RoboClient
                 Connected(this, new EventArgs());
             connected = true;
         }
+        private void onConnectFailed()
+        {
+            if (ConnectFailed != null)
+                ConnectFailed(this, new EventArgs());
+            connected = false;
+        }
         private void onDisconnected()
         {
             if (Disconnected != null)
@@ -62,6 +70,11 @@ namespace RoboClient
                 Authorised(this, new EventArgs());
         }
 
+        private void onAuthoriseFailed()
+        {
+            if (AuthoriseFailed != null)
+                AuthoriseFailed(this, new EventArgs());
+        }
         private void onDataReceived(String msg)
         {
             if (DataReceived != null)
@@ -70,12 +83,21 @@ namespace RoboClient
 
         public void Connect(String ip, int port, String pointName)
         {
-            ipHost = Dns.GetHostEntry(ip);//Dns.Resolve(ip);//("192.168.0.174");
-            ipAddr = ipHost.AddressList[0];
-            endPoint = new IPEndPoint(ipAddr, port);
-            this.pointName = pointName;
-            sClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sClient.BeginConnect(endPoint, new AsyncCallback(ConnectCallback), sClient);
+            try
+            {
+                Logger.Log(String.Format("Подключение к {0} {1}:{2}...", pointName, ip, port), this);
+                ipHost = Dns.Resolve(ip);//Dns.GetHostEntry(ip);//Dns.Resolve(ip);//("192.168.0.174");
+                ipAddr = ipHost.AddressList[0];
+                endPoint = new IPEndPoint(ipAddr, port);
+                this.pointName = pointName;
+                sClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sClient.BeginConnect(endPoint, new AsyncCallback(ConnectCallback), sClient);
+            }
+            catch(SocketException e)
+            {
+                Logger.Log(e.Message,this);
+                onConnectFailed();
+            }
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -103,20 +125,27 @@ namespace RoboClient
         }
         private void SendCallback(IAsyncResult ar)
         {
-            Logger.Log("Данные отправлены");
+            Logger.Log("Данные отправлены",this);
             //  тут начать слушание сервера пока не отключились
         }
 
 
         private void ReceiveCallback(IAsyncResult ar)
         {
-            byte[] receiveBuffer = ar.AsyncState as byte[];
-            int BytesRead = sClient.EndReceive(ar);
-            if (BytesRead > 0)
+            try
             {
-                string Response = Encoding.UTF8.GetString(receiveBuffer, 0, BytesRead);
-                onDataReceived(Response);
-                sClient.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, 0, new AsyncCallback(ReceiveCallback), receiveBuffer);
+                byte[] receiveBuffer = ar.AsyncState as byte[];
+                int BytesRead = sClient.EndReceive(ar);
+                if (BytesRead > 0)
+                {
+                    string Response = Encoding.UTF8.GetString(receiveBuffer, 0, BytesRead);
+                    onDataReceived(Response);
+                    sClient.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, 0, new AsyncCallback(ReceiveCallback), receiveBuffer);
+                }
+            }
+            catch(SocketException e)
+            {
+                Logger.Log(e.Message, this);
             }
         }
         
@@ -130,7 +159,7 @@ namespace RoboClient
         // авторизация на robolab, получение данных о пользователе
         public void Authorise(String name, String pass)
         {
-            string URLAuth = "http://192.168.0.125:3000/auth"; //"http://195.208.237.193:3000/auth" - это боевой сервер, потом заменить на него. 
+            string URLAuth = "http://195.208.237.193:3000/auth";// - это боевой сервер, потом заменить на него. "http://192.168.0.125:3000/auth"; 
             string postString = string.Format("login={0}&pass={1}", name, pass);
 
             const string contentType = "application/x-www-form-urlencoded";
@@ -154,7 +183,7 @@ namespace RoboClient
             {
                 using (WebResponse response = webRequest.GetResponse())
                 {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://192.168.0.125:3000/auth/userInfo"); // и тут тоже
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://195.208.237.193:3000/auth/userInfo");//"http://192.168.0.125:3000/auth/userInfo"); // и тут тоже
                     request.CookieContainer = cookies;
                     HttpWebResponse responseUserInfo = (HttpWebResponse)request.GetResponse();
                     if (responseUserInfo.StatusCode == HttpStatusCode.Forbidden)
@@ -177,25 +206,30 @@ namespace RoboClient
                         }
                         responseUserInfo.Close();
                         Logger.Log("Вы вошли как: " + userName, this);
+                        onAuthorised();
+                        return;
                     }
                 }
 
             }
             catch (WebException exp)
             {
-                using (WebResponse response = exp.Response)
+                /*using (WebResponse response = exp.Response)
                 {
                     HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    switch ((int)httpResponse.StatusCode)
+                    if (httpResponse != null)
                     {
-                        case 401:
-                            Logger.Log("Неверный логин или пароль", this);
-                            break;
+                        switch ((int)httpResponse.StatusCode)
+                        {
+                            case 401:
+                                Logger.Log("Неверный логин или пароль", this);
+                                break;
+                        }
                     }
-
-                }
+                }*/
+                Logger.Log(exp.Message, this);
             }
-
+            onAuthoriseFailed();
         }
     }
 

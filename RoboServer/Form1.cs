@@ -41,6 +41,8 @@ namespace RoboServer
 
             socketServer.setWebSockServer(webSocketServer);
             webSocketServer.setSocketServer(socketServer);
+
+            
         }
 
         public void appendWebSockLogBox(string txt)

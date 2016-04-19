@@ -2,38 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RoboLab
 {
-    public class Robot
+    public class Robot : MarshalByRefObject
     {
-        private BaseRobot baseRobot {
+        private BaseRobot _baseRobot;
+        private BaseRobot baseRobot
+        {
             get
-            { return baseRobot; }
+            { return _baseRobot; }
             set
             {
-                baseRobot = value;
-                baseRobot.ActionCompleted += BaseRobot_ActionCompleted;
-                baseRobot.SensorUpdate += BaseRobot_SensorUpdate;
+                if (_baseRobot != null)
+                    _baseRobot.SensorUpdate -= BaseRobot_SensorUpdate;
+                _baseRobot = value;
+                if(_baseRobot != null)
+                    _baseRobot.SensorUpdate += BaseRobot_SensorUpdate;
             }
         }
 
         private void BaseRobot_SensorUpdate(object sender, SensorUpdateEventArgs args)
         {
-            if (SensorUpdate != null)
-                SensorUpdate(this, args);
+            if (SensorUpdated != null)
+                Task.Factory.StartNew(() => this.SensorUpdated(this, args)).ContinueWith(t=>onCrashed(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                
         }
 
-        private void BaseRobot_ActionCompleted(object sender, ActionCompletedEventArgs args)
+        public event CrashedEventHandler Crashed;
+
+        private void onCrashed(Exception e)
         {
-            if (ActionCompleted != null)
-                ActionCompleted(this, args);
+            if (Crashed != null)
+                Crashed(this, new CrashedEventArgs(e));
         }
 
-        public event SensorUpdateEventHandler SensorUpdate;
+        public event SensorUpdateEventHandler SensorUpdated;
 
-        public event ActionCompletedEventHandler ActionCompleted;
+        public event SleepEventHandler FellAsleep;
+
+        public event SleepEventHandler WokeUp;
 
         public event PrintEventHandler PrintMessage;
 
@@ -42,9 +52,14 @@ namespace RoboLab
 
         }
 
-        public void SetBaseRobot(BaseRobot baseRobot)
+        internal void SetBaseRobot(BaseRobot baseRobot)
         {
             this.baseRobot = baseRobot;
+        }
+
+        public BaseRobot GetBaseRobot()
+        {
+            return baseRobot;
         }
 
         public Robot(BaseRobot baseRobot)
@@ -57,23 +72,27 @@ namespace RoboLab
             if (PrintMessage != null)
                 PrintMessage(this, new PrintEventArgs(msg.ToString()));
         }
-
+        public void Print(string msg)
+        {
+            if (PrintMessage != null)
+                PrintMessage(this, new PrintEventArgs(msg));
+        }
         /// <summary>
         /// Команда "идти вперед"
         /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public void MoveForward(double distance)
+        /// <param name="speed">Скорость движения</param>
+        public void BeginMoveForward(double speed)
         {
-            baseRobot.MoveForward(distance);
+            baseRobot.BeginMoveForward(speed);
         }
 
         /// <summary>
         /// Команда "идти назад"
         /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public void MoveBackward(double distance)
+        /// <param name="speed">Скорость движения</param>
+        public void BeginMoveBackward(double speed)
         {
-            baseRobot.MoveBackward(distance);
+            baseRobot.BeginMoveBackward(speed);
         }
 
         /// <summary>
@@ -87,57 +106,21 @@ namespace RoboLab
         /// <summary>
         /// Команда "повернуть налево"
         /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public void TurnLeft(double angle)
+        /// <param name="speed">Скорость поворота</param>
+        public void BeginTurnLeft(double speed)
         {
-            baseRobot.TurnLeft(angle);
+            baseRobot.BeginTurnLeft(speed);
         }
 
         /// <summary>
         /// Команда "повернуть направо"
         /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public void TurnRight(double angle)
+        /// <param name="speed">Скорость поворота</param>
+        public void BeginTurnRight(double speed)
         {
-            baseRobot.TurnRight(angle);
+            baseRobot.BeginTurnRight(speed);
         }
-
-
-        /// <summary>
-        /// Асинхронная команда "идти вперед"
-        /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public void StartMoveForward(double distance)
-        {
-            baseRobot.StartMoveForward(distance);
-        }
-
-        /// <summary>
-        /// Асинхронная команда "идти назад"
-        /// </summary>
-        /// <param name="distance">Расстояние, на которое пройти</param>
-        public void StartMoveBackward(double distance)
-        {
-            baseRobot.StartMoveBackward(distance);
-        }
-
-        /// <summary>
-        /// Асинхронная команда "повернуть налево"
-        /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public void StartTurnLeft(double angle)
-        {
-            baseRobot.StartTurnLeft(angle);
-        }
-
-        /// <summary>
-        /// Асинхронная команда "повернуть направо"
-        /// </summary>
-        /// <param name="angle">Угол поворота</param>
-        public void StartTurnRight(double angle)
-        {
-            baseRobot.StartTurnRight(angle);
-        }
+        
 
         /// <summary>
         /// Специальное действие
@@ -156,17 +139,45 @@ namespace RoboLab
         {
             return baseRobot.GetSpecialActions();
         }
-
+        
         /// <summary>
         /// Основная программа робота.
         /// Главный метод для переопределения!
         /// </summary>
-        public virtual void Main()
+        public virtual void Run()
         {
+            
+        }
+        
+        internal void RunAsync()
+        {
+            Task.Factory.StartNew(Run).ContinueWith(t => onCrashed(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+        }
 
+        public void Sleep(double time = 0)
+        {
+            if (FellAsleep != null)
+                FellAsleep(this, new SleepEventArgs(time));
+        }
+
+        public void WakeUp()
+        {
+            if (WokeUp != null)
+                WokeUp(this, new SleepEventArgs());
         }
     }
 
+    public delegate void CrashedEventHandler(object sender, CrashedEventArgs args);
+    [Serializable]
+    public class CrashedEventArgs : EventArgs
+    {
+        public Exception Exception { get; set; }
+        public CrashedEventArgs(Exception exception = null)
+        {
+            Exception = exception;
+        }
+    }
+    [Serializable]
     public class PrintEventArgs : EventArgs
     {
         public string Message { get; set; }
@@ -175,6 +186,17 @@ namespace RoboLab
             Message = msg;
         }
     }
+    [Serializable]
+    public class SleepEventArgs : EventArgs
+    {
+        public double Time { get; set; }
+        public SleepEventArgs(double time = 0)
+        {
+            Time = time;
+        }
+    }
 
     public delegate void PrintEventHandler(object sender, PrintEventArgs args);
+
+    public delegate void SleepEventHandler(object sender, SleepEventArgs args);
 }

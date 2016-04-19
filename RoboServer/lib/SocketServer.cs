@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 
@@ -26,7 +25,6 @@ namespace RoboServer.lib
 
         private TcpListener server;
         private int port;
-        private MainForm form;
         private WebSockServer webSockServer;
 
         public class ConnectionInfo
@@ -35,19 +33,22 @@ namespace RoboServer.lib
             public string name;
             public int userID;
             public int selfID;
-            public List<Device> deviceList;
             public string command;
             public byte[] buffer = new byte[1024];
         }
+        
+        public event ConnectionEventHadler Connected;
+        public event ConnectionEventHadler MessageReceived;
+        public event ConnectionEventHadler MessageSent;
 
-       // private Thread acceptThread;
+
+
+        // private Thread acceptThread;
         private List<ConnectionInfo> connections = new List<ConnectionInfo>();
 
-        public SocketServer(string ip, int newPort, MainForm frm) 
+        public SocketServer(string ip, int newPort) 
         {
-            form = frm;
             port = newPort;
-            form.Invoke(new Action(() => frm.appendSockLogBox("\nSocket server created: ip = " + ip + " port = " + port + "\n")));
         }
 
         public void Start()
@@ -77,16 +78,18 @@ namespace RoboServer.lib
             connection.clientSock = newClient;
             connection.name = "New user";
 
-            form.Invoke(new Action(() => form.appendSockLogBox("\nNew connection!\n")));
+            //form.Invoke(new Action(() => form.appendSockLogBox("\nNew connection!\n")));
+            if (Connected != null)
+                Connected(this, new ConnectionEventArgs());
 
             lock (connection) connections.Add(connection);
-            connection.clientSock.BeginReceive(connection.buffer, 0, connection.buffer.Length, 0, new AsyncCallback(RecieveCallback), connection.clientSock);
+            connection.clientSock.BeginReceive(connection.buffer, 0, connection.buffer.Length, 0, new AsyncCallback(ReceiveCallback), connection.clientSock);
 
         }
 
 
        // вызывается когда получаем сообщение
-        private void RecieveCallback(IAsyncResult ar)
+        private void ReceiveCallback(IAsyncResult ar)
         {
             Socket handler = (Socket)ar.AsyncState;
             ConnectionInfo clientInfo = GetConnectionBySock(handler);
@@ -98,8 +101,10 @@ namespace RoboServer.lib
             if(bytesRead > 0)
             {
                 clientInfo.command += Encoding.UTF8.GetString(clientInfo.buffer, 0, bytesRead);
-                ProcessCommand(clientInfo);
-                clientInfo.clientSock.BeginReceive(clientInfo.buffer, 0, clientInfo.buffer.Length, 0, new AsyncCallback(RecieveCallback), handler);
+                //ProcessCommand(clientInfo);
+                if (MessageReceived != null)
+                    MessageReceived(this, new ConnectionEventArgs());
+                clientInfo.clientSock.BeginReceive(clientInfo.buffer, 0, clientInfo.buffer.Length, 0, new AsyncCallback(ReceiveCallback), handler);
             }
         }
 
@@ -123,7 +128,7 @@ namespace RoboServer.lib
                         client.selfID = (int)userJson.GetValue("selfID");
                         client.name = (string)userJson.GetValue("name");
                         //client.deviceList = userJson.GetValue("deviceList");
-
+                        /*
                         client.deviceList = new List<Device>();
                         foreach (var d in userJson["deviceList"].Children())
                         {
@@ -132,7 +137,7 @@ namespace RoboServer.lib
                                 id = (int)d["id"],
                                 name = (string)d["name"]
                             });
-                        }
+                        }*/
 
                         break;
                 }
@@ -199,11 +204,7 @@ namespace RoboServer.lib
             {
                 dynamic client = new JObject();
                 client.id = ci.selfID;
-                client.name = ci.name;
-                if (ci.deviceList != null)
-                    client.deviceList = JToken.FromObject(ci.deviceList);
-                else
-                    client.deviceList = 0;                                          // ХРЕНЬ! ИСПРАВИТЬ!
+                client.name = ci.name;                                   
 
                 clients.Add(client);
             }
