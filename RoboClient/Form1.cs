@@ -16,7 +16,6 @@ namespace RoboClient
     public partial class Form1 : Form
     {
         RobolabConnection connection;
-        //Dictionary<string, Robot> robots;
         RobotDispatcher dispatcher;
         public Form1()
         {
@@ -27,15 +26,17 @@ namespace RoboClient
 
         private void Connection_ConnectFailed(object sender, EventArgs e)
         {
-            serverPanel.Enabled = true;
+            this.Invoke(() => serverPanel.Enabled = true);
         }
 
         private void Connection_AuthoriseFailed(object sender, EventArgs e)
         {
-
-            nameText.Enabled = true;
-            passText.Enabled = true;
-            authBtn.Enabled = true;
+            this.Invoke(() =>
+            {
+                nameText.Enabled = true;
+                passText.Enabled = true;
+                authBtn.Enabled = true;
+            });
         }
 
         private void Connection_Disconnected(object sender, EventArgs e)
@@ -55,7 +56,7 @@ namespace RoboClient
 
         private void Connection_Authorised(object sender, EventArgs e)
         {
-            serverPanel.Enabled = true;
+            this.Invoke(() => serverPanel.Enabled = true);
         }
 
         private void addRobot(String name, BaseRobot baseRobot)
@@ -114,7 +115,7 @@ namespace RoboClient
             connection.AuthoriseFailed += Connection_AuthoriseFailed;
             connection.ConnectFailed += Connection_ConnectFailed;
 
-            dispatcher.AddBaseRobot("test", new DummyRobot());
+            /*dispatcher.AddBaseRobot("test", new DummyRobot());
 
             string s = File.ReadAllText("../../../RoboLabLib/TestRobot.cs");
             dispatcher.RunRobot("test", s, "RoboLab.TestRobot");
@@ -123,14 +124,14 @@ namespace RoboClient
             t.Interval = 1000;
             t.Tick += T_Tick;
            
-            t.Start();
+            t.Start();*/
         }
-
+        /*
         private void T_Tick(object sender, EventArgs e)
         {
             Logger.Log("Stop");
             dispatcher.StopRobot("test");
             ((Timer)sender).Stop();
-        }
+        }*/
     }
 }

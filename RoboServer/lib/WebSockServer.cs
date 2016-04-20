@@ -19,25 +19,34 @@ namespace RoboServer.lib
 
         private string ip;
         private int port;
-        private MainForm form;
+        
+        public event WebConnectionEventHadler Connected;
+        public event WebConnectionEventHadler Disconnected;
+        public event WebConnectionEventHadler MessageReceived;
+        public event WebConnectionEventHadler MessageSent;
 
-        private SocketServer sockServer;
-
-        private class WebConnectionInfo
-        {
-            public IWebSocketConnection clientWebSock;
-            public int userID;
-        }
-
+        
         private List<WebConnectionInfo> connections = new List<WebConnectionInfo>();
 
-        public WebSockServer(string newIp, int newPort, MainForm frm)
+        private int idCounter;
+        private Queue<int> freeIds;
+
+        public WebSockServer(string newIp, int newPort)
         {
             ip = "0.0.0.0"; // newIp;
             port = newPort;
-            form = frm;
+            idCounter = 0;
+            freeIds = new Queue<int>();
             server = new WebSocketServer("ws://" + ip + ":" + port);
-            form.Invoke(new Action(() => frm.appendWebSockLogBox("\nWebSocket server created: ip = " + ip + " port = " + port + "\n")));
+            //form.Invoke(new Action(() => frm.appendWebSockLogBox("\nWebSocket server created: ip = " + ip + " port = " + port + "\n")));
+        }
+
+        private int getNextId()
+        {
+            if (freeIds.Count > 0)
+                return freeIds.Dequeue();
+            else
+                return idCounter++;
         }
 
         public void Start()
@@ -46,78 +55,52 @@ namespace RoboServer.lib
             {
                 socket.OnOpen = () =>
                 {
-                    form.Invoke(new Action(() => form.appendWebSockLogBox("\nOpen\n")));
+                    //form.Invoke(new Action(() => form.appendWebSockLogBox("\nOpen\n")));
 
                     WebConnectionInfo connection = new WebConnectionInfo();
                     connection.clientWebSock = socket;
-                  
+                    connection.userID = getNextId();
+
                     connections.Add(connection);
+                    if (Connected != null)
+                        Connected(this, new WebConnectionEventArgs(connection));
                 };
                 socket.OnClose = () =>
                 {
-                    form.Invoke(new Action(() => form.appendWebSockLogBox("\nClose\n")));
+                    //form.Invoke(new Action(() => form.appendWebSockLogBox("\nClose\n")));
 
-                    WebConnectionInfo elt = connections.Find(item => item.clientWebSock == socket);
-                    connections.Remove(elt);
+                    WebConnectionInfo connection = connections.Find(item => item.clientWebSock == socket);
+                    connections.Remove(connection);
+                    freeIds.Enqueue(connection.userID);
+                    if (Disconnected != null)
+                        Disconnected(this, new WebConnectionEventArgs(connection));
                 };
                 socket.OnMessage = message =>
                 {
-                    form.Invoke(new Action(() => form.appendWebSockLogBox("\nMessage: " + message + "\n")));
-
-                    parseMessage(message, socket);
-                   // allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                    //form.Invoke(new Action(() => form.appendWebSockLogBox("\nMessage: " + message + "\n")));
+                    WebConnectionInfo connection = connections.Find(item => item.clientWebSock == socket);
+                    connection.message = message;
+                    //parseMessage(message, socket);
+                    // allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
+                    if (Connected != null)
+                        Connected(this, new WebConnectionEventArgs(connection));
                 };
             });
         }
-
-        public void setSocketServer(SocketServer serv)
+        
+        public void MessageUser(int userID, string message)
         {
-            sockServer = serv;
-        }
+            WebConnectionInfo connection = connections.Find(item => item.userID == userID);
+            connection.clientWebSock.Send(message);
 
-        public void parseMessage(String message, IWebSocketConnection socket)
-        {
-            switch (message[0])
-            {
-                case '0':
-                    //recieveFile();
-                    break;
-                case '1':
-                    recieveCommand(message, socket);
-                    break;
-                case '3':
-                    parseInfoMessage(message.Replace("3",""), socket);
-                    break;
-            }
-        }
-
-        public void parseInfoMessage(String message, IWebSocketConnection socket)
-        {
-            int ind = connections.FindIndex(item => item.clientWebSock == socket);
-            string[] words = message.Split(' ');
-            switch(words[0])
-            {
-                case "setUserID":
-                    connections[ind].userID = int.Parse(words[1]);
-                    socket.Send("3setUserID");
-                    break;
-
-                case "getClients":
-                    JObject sockClient = sockServer.getClientsByUserID(connections[ind].userID);
-
-                    String res = sockClient.ToString();
-                    socket.Send("3setClientsList" + "#" + res);
-                    break;
-            }
-        }
-
-        public void recieveCommand(String command, IWebSocketConnection socket)
-        {
-            String[] arrMess = command.Split(' ');
-            int ind = connections.FindIndex(item => item.clientWebSock == socket);
-
-           // if(command == "goForward" || command == "goLeft" || command == "goRight" || command == "goDown" ||)
-            sockServer.sendToID(connections[ind].userID, int.Parse(arrMess[1]), int.Parse(arrMess[2]), arrMess[3]);
         }
     }
+
+    public class WebConnectionInfo
+    {
+        public IWebSocketConnection clientWebSock;
+        public int userID;
+        public string message;
+    }
+
 }

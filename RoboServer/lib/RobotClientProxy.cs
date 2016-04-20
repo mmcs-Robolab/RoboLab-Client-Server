@@ -16,6 +16,11 @@ namespace RoboServer.lib
             
         }
 
+        public void UnbindUser(int UserID)
+        {
+
+        }
+
         public void CommandRobot(int UserID, string Command)
         {
             

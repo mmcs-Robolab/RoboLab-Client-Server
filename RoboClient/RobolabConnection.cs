@@ -28,8 +28,6 @@ namespace RoboClient
 
         private string pointName;
         private string userName;
-        private int userID;
-        private int selfID;
         //private List<Device> deviceList;
         public delegate void ConnectionEventHandler(Object sender, EventArgs e);
         public event ConnectionEventHandler Connected;
@@ -104,15 +102,22 @@ namespace RoboClient
         {
             //  Получаем сокет
             Socket sClient = (Socket)ar.AsyncState;
-            sClient.EndConnect(ar);
+            try
+            {
+                sClient.EndConnect(ar);
+            }
+            catch(Exception e)
+            {
+                Logger.Log(e.Message, this);
+                onConnectFailed();
+                return;
+            }
             onConnected();
             byte[] receiveBuffer = new byte[1024];
             //  тут начать слушание сервера пока не отключились
             sClient.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, 0, new AsyncCallback(ReceiveCallback), 0);
 
             JObject userInfo = new JObject();
-            userInfo.Add("userID", userID);
-            userInfo.Add("selfID", selfID);
             userInfo.Add("name", pointName);
             /*if (deviceList != null)
                 userInfo.Add("deviceList", JToken.FromObject(deviceList));
@@ -198,11 +203,8 @@ namespace RoboClient
                             string responseText = reader.ReadToEnd();
 
                             JObject json = JObject.Parse(responseText);
-                            userID = (int)json.GetValue("userId");
                             userName = (string)json.GetValue("username");
-
-                            Random rand = new Random();
-                            selfID = rand.Next(10, 99999);
+                            
                         }
                         responseUserInfo.Close();
                         Logger.Log("Вы вошли как: " + userName, this);

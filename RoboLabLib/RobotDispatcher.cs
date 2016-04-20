@@ -99,11 +99,11 @@ namespace RoboLab
                 robots[name].RunRobotAsync();
 
                 //Test only
-                robots[name].GetBaseRobot().BeginGetSensorValue(SensorType.Odometry);
+                //robots[name].GetBaseRobot().BeginGetSensorValue(SensorType.Odometry);
                 //System.Environment.StackTrace
             }
             else
-                RunRobot(name, typeof(Robot), true);
+                robots[name].SetBaseRobot(typeof(Robot), baseRobot);
         }
         
 

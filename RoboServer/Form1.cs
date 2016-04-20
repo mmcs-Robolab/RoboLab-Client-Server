@@ -16,7 +16,11 @@ namespace RoboServer
     public partial class MainForm : Form
     {
         private string ip;
+        SocketServer socketServer;
+        WebSockServer webSocketServer;
+        Dictionary<int, int> userBindings;
 
+        Dictionary<int, IRobotClient> robotClients;
 
         public MainForm()
         {
@@ -33,16 +37,78 @@ namespace RoboServer
 
         private void createSockServerBtn_Click(object sender, EventArgs e)
         {
-            WebSockServer webSocketServer = new WebSockServer(ip, getWebSocketPort(), this);
+            userBindings = new Dictionary<int, int>();
+            robotClients = new Dictionary<int, IRobotClient>();
+
+            webSocketServer = new WebSockServer(ip, getWebSocketPort());
             webSocketServer.Start();
 
-            SocketServer socketServer = new SocketServer(ip, getSocketPort(), this);
+            socketServer = new SocketServer(ip, getSocketPort());
             socketServer.Start();
 
-            socketServer.setWebSockServer(webSocketServer);
-            webSocketServer.setSocketServer(socketServer);
+            webSocketServer.Connected += WebSocketServer_Connected;
+            webSocketServer.Disconnected += WebSocketServer_Disconnected;
+            webSocketServer.MessageReceived += WebSocketServer_MessageReceived;
+            webSocketServer.MessageSent += WebSocketServer_MessageSent;
 
-            
+            socketServer.Connected += SocketServer_Connected;
+            socketServer.Disconnected += SocketServer_Disconnected;
+            socketServer.MessageReceived += SocketServer_MessageReceived;
+            socketServer.MessageSent += SocketServer_MessageSent;
+        }
+
+        private void SocketServer_MessageSent(object sender, ConnectionEventArgs args)
+        {
+            appendSockLogBox("Message sent from "+args.Connection.selfID);
+        }
+
+        private void SocketServer_MessageReceived(object sender, ConnectionEventArgs args)
+        {
+            appendSockLogBox("Message \"" + args.Connection.command + "\" received by " + args.Connection.selfID);
+        }
+
+        private void SocketServer_Disconnected(object sender, ConnectionEventArgs args)
+        {
+            appendSockLogBox(args.Connection.selfID + " disconnected");
+        }
+
+        private void SocketServer_Connected(object sender, ConnectionEventArgs args)
+        {
+            appendSockLogBox(args.Connection.selfID + " connected");
+            robotClients[args.Connection.selfID] = new RobotClientProxy();
+        }
+
+        private void WebSocketServer_MessageSent(object sender, WebConnectionEventArgs args)
+        {
+            appendWebSockLogBox("Message sent to " + args.Connection.userID);
+        }
+
+        private void WebSocketServer_MessageReceived(object sender, WebConnectionEventArgs args)
+        {
+            appendWebSockLogBox("Message \"" + args.Connection.message + "\" received by " + args.Connection.userID);
+            string[] parts = args.Connection.message.Split('#');
+            if (parts.Count() == 0)
+                return;
+            switch(parts[0])
+            {
+                case "bindToClient":
+                    int clientID;
+                    if(int.TryParse(parts[1], out clientID))
+                    {
+                        
+                    }
+                    break;
+            }
+        }
+
+        private void WebSocketServer_Disconnected(object sender, WebConnectionEventArgs args)
+        {
+            appendWebSockLogBox(args.Connection.userID + " disconnected");
+        }
+
+        private void WebSocketServer_Connected(object sender, WebConnectionEventArgs args)
+        {
+            appendWebSockLogBox(args.Connection.userID + " connected");
         }
 
         public void appendWebSockLogBox(string txt)

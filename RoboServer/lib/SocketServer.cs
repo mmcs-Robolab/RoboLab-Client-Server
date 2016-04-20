@@ -21,34 +21,26 @@ namespace RoboServer.lib
 
     class SocketServer
     {
-        private const int MESSAGE_COMMAND_CODE = 1;  // изменить при составлении нормального протокола 
-
+        
         private TcpListener server;
         private int port;
-        private WebSockServer webSockServer;
 
-        public class ConnectionInfo
-        {
-            public Socket clientSock;
-            public string name;
-            public int userID;
-            public int selfID;
-            public string command;
-            public byte[] buffer = new byte[1024];
-        }
-        
         public event ConnectionEventHadler Connected;
+        public event ConnectionEventHadler Disconnected;
         public event ConnectionEventHadler MessageReceived;
         public event ConnectionEventHadler MessageSent;
 
-
-
-        // private Thread acceptThread;
+        
         private List<ConnectionInfo> connections = new List<ConnectionInfo>();
+
+        private int idCounter;
+        private Queue<int> freeIds;
 
         public SocketServer(string ip, int newPort) 
         {
             port = newPort;
+            freeIds = new Queue<int>();
+            idCounter = 0;
         }
 
         public void Start()
@@ -58,6 +50,15 @@ namespace RoboServer.lib
 
             AsyncCallback aCallback = new AsyncCallback(AcceptTcpClientCallback);
             server.Server.BeginAccept(aCallback, server.Server);
+            
+        }
+
+        private int getNextId()
+        {
+            if (freeIds.Count > 0)
+                return freeIds.Dequeue();
+            else
+                return idCounter++;
         }
 
         // настраиваем и запускаем сервер
@@ -77,10 +78,11 @@ namespace RoboServer.lib
             ConnectionInfo connection = new ConnectionInfo();
             connection.clientSock = newClient;
             connection.name = "New user";
+            connection.selfID = getNextId();
 
             //form.Invoke(new Action(() => form.appendSockLogBox("\nNew connection!\n")));
             if (Connected != null)
-                Connected(this, new ConnectionEventArgs());
+                Connected(this, new ConnectionEventArgs(connection));
 
             lock (connection) connections.Add(connection);
             connection.clientSock.BeginReceive(connection.buffer, 0, connection.buffer.Length, 0, new AsyncCallback(ReceiveCallback), connection.clientSock);
@@ -103,49 +105,11 @@ namespace RoboServer.lib
                 clientInfo.command += Encoding.UTF8.GetString(clientInfo.buffer, 0, bytesRead);
                 //ProcessCommand(clientInfo);
                 if (MessageReceived != null)
-                    MessageReceived(this, new ConnectionEventArgs());
+                    MessageReceived(this, new ConnectionEventArgs(clientInfo));
                 clientInfo.clientSock.BeginReceive(clientInfo.buffer, 0, clientInfo.buffer.Length, 0, new AsyncCallback(ReceiveCallback), handler);
             }
         }
-
-        // парсинг и выполнение пришедшей команды
-        private bool ProcessCommand(ConnectionInfo client)
-        {
-            int endPos = client.command.IndexOf(Environment.NewLine);
-            if (endPos > -1)
-            {
-                string []cmds = client.command.Split('#');  // при передаче json объекта, приходится разделять параметры не пробелом, а решеткой. Может стоить всегда так делать.
-                client.command.Remove(0, endPos);
-
-                //form.Invoke(new Action(() => form.appendSockLogBox("\nCommand : " + cmd)));
-
-                switch (cmds[0])
-                {
-                    case "setUserInfo":
-                        JObject userJson = JObject.Parse(cmds[1]);
-
-                        client.userID = (int)userJson.GetValue("userID");
-                        client.selfID = (int)userJson.GetValue("selfID");
-                        client.name = (string)userJson.GetValue("name");
-                        //client.deviceList = userJson.GetValue("deviceList");
-                        /*
-                        client.deviceList = new List<Device>();
-                        foreach (var d in userJson["deviceList"].Children())
-                        {
-                            client.deviceList.Add(new Device()
-                            {
-                                id = (int)d["id"],
-                                name = (string)d["name"]
-                            });
-                        }*/
-
-                        break;
-                }
-
-                return true;
-            }
-            return false;
-        }
+        
 
         //  Поиск соединения по сокету
         private ConnectionInfo GetConnectionBySock(Socket sock)
@@ -158,73 +122,43 @@ namespace RoboServer.lib
         }
 
         // поиск соединения по id юзера и по id клиента 
-        private ConnectionInfo getConnectionByID(int userID, int selfID)
+        private ConnectionInfo getConnectionByID(int selfID)
         {
-            lock (connections) foreach (ConnectionInfo ci in connections)
-                {
-                    if (ci.userID == userID && ci.selfID == selfID) return ci;
-                }
+            lock (connections) connections.Find(item => item.selfID == selfID);
             return null;
         }
-
-        // поиск соединения по id юзера
-        private List<ConnectionInfo> getConnectionsByUserID(int id)
-        {
-            List<ConnectionInfo> curUserConnections = new List<ConnectionInfo>();
-
-            lock (connections) foreach (ConnectionInfo ci in connections)
-                {
-                    if (ci.userID == id) curUserConnections.Add(ci);
-                }
-            return curUserConnections;
-        }
-
+        
         // отправка сообщения всем клиентам
         public void SendToAll(string msg)
         {
-            //  Строчку в байты
-
+            
             byte[] byteData = Encoding.UTF8.GetBytes(msg);
 
             lock (connections) foreach (ConnectionInfo client in connections)
                     client.clientSock.Send(byteData, 0, byteData.Length, 0);
+            
         }
-
-        public void setWebSockServer(WebSockServer webSockServ)
+        
+        public void sendToID(int remoteID, String message)
         {
-            webSockServer = webSockServ;
-        }
+            ConnectionInfo ci;
+            lock (connections) ci = connections.Find(item => item.selfID == remoteID);
 
-        public JObject getClientsByUserID(int id)
-        {
-            List<ConnectionInfo> curUserConnections = getConnectionsByUserID(id);
-            List<JObject> clients = new List<JObject>();
-
-            foreach (ConnectionInfo ci in curUserConnections)
-            {
-                dynamic client = new JObject();
-                client.id = ci.selfID;
-                client.name = ci.name;                                   
-
-                clients.Add(client);
-            }
-
-            dynamic list = new JObject();
-            list.clients = JToken.FromObject(clients);
-
-            return list;
-        }
-
-        public void sendToID(int userID, int remoteID, int deviceID, String message)
-        {
-
-            ConnectionInfo ci = getConnectionByID(userID, remoteID);
-
-            byte[] byteData = Encoding.UTF8.GetBytes(MESSAGE_COMMAND_CODE + " " + deviceID + " " + message);
+            byte[] byteData = Encoding.UTF8.GetBytes(message);
 
             ci.clientSock.Send(byteData, 0, byteData.Length, 0);
+
+            if (MessageSent != null)
+                MessageSent(this, new ConnectionEventArgs(ci));
         }
+    }
 
-
+    public class ConnectionInfo
+    {
+        public Socket clientSock;
+        public string name;
+        public int selfID;
+        public string command;
+        public byte[] buffer = new byte[1024];
     }
 }

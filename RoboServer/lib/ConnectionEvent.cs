@@ -10,12 +10,21 @@ namespace RoboServer.lib
 
     public class ConnectionEventArgs : EventArgs
     {
-        public string Message { get; set; }
-        public ConnectionEventArgs(string message = "")
+        public ConnectionInfo Connection { get; set; }
+        public ConnectionEventArgs(ConnectionInfo connection = null)
         {
-            Message = message;
+            Connection = connection;
         }
     }
 
-    
+    public delegate void WebConnectionEventHadler(object sender, WebConnectionEventArgs args);
+
+    public class WebConnectionEventArgs : EventArgs
+    {
+        public WebConnectionInfo Connection { get; set; }
+        public WebConnectionEventArgs(WebConnectionInfo connection = null)
+        {
+            Connection = connection;
+        }
+    }
 }
