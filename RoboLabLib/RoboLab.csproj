@@ -34,8 +34,13 @@
       <HintPath>..\packages\ChildProcesses.1.2.5577.529\lib\net\ChildProcesses.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,10 +54,16 @@
     <Compile Include="DummyRobot.cs" />
     <Compile Include="DynamicCompiler.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MathLib\Vector3.cs" />
+    <Compile Include="Objects\Barrier.cs" />
+    <Compile Include="Objects\Plane.cs" />
+    <Compile Include="Objects\SceneObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Robot.cs" />
     <Compile Include="RobotDispatcher.cs" />
     <Compile Include="RobotThreadWrapper.cs" />
+    <Compile Include="SimulationController.cs" />
+    <Compile Include="VirtualRobot.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
