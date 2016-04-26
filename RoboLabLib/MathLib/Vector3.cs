@@ -35,8 +35,8 @@ namespace RoboLab.MathLib
 
         public void rotateOnY(double angle)
         {
-            this.x = this.x * Math.Cos(angle) + this.z * Math.Sin(angle);
-            this.z = -this.x * Math.Sin(angle) + this.z * Math.Cos(angle);
+            this.x = this.x * Math.Cos(angle) - this.z * Math.Sin(angle);
+            this.z = this.x * Math.Sin(angle) + this.z * Math.Cos(angle);
         }
 
         public void add(Vector3 vec)

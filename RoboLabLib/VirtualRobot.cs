@@ -18,6 +18,8 @@ namespace RoboLab
         public double height;
         public double depth;
 
+        public Rect boundRect;
+
         private double speedCoef = 0.1;
 
 
@@ -27,6 +29,19 @@ namespace RoboLab
             position = new Vector3(0, 0, 0);
             direction = new Vector3(0, 0, -1);
             up = new Vector3(0, 1, 0);
+
+            width = 0;
+            height = 0;
+            depth = 0;
+
+            boundRect = new Rect();
+        }
+
+        public void createRectBound()
+        {
+            boundRect = new Rect(position, 
+                                 new Vector3(position.x - width/2, position.y, position.z - depth/2),
+                                 new Vector3(position.x + width/2, position.y, position.z + depth/2));
         }
 
         public override void MoveForward(double paramVelocity)
@@ -54,11 +69,13 @@ namespace RoboLab
         public override void TurnLeft(double angle)
         {
             direction.rotateOnY(angle);
+            boundRect.rotate(angle);
         }
 
         public override void TurnRight(double angle)
         {
             direction.rotateOnY(-angle);
+            boundRect.rotate(angle);
         }
 
         public override void StartTurnLeft(double angle)

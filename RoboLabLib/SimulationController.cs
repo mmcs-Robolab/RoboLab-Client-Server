@@ -57,6 +57,7 @@ namespace RoboLab
         private void gameLoop(Object source, System.Timers.ElapsedEventArgs e)
         {
             updatePosition();
+            collisionTest();
         }
 
         public void updatePosition()
@@ -119,6 +120,44 @@ namespace RoboLab
                 }
             }
 
+        }
+
+        public Barrier intersection()
+        {
+            double x11 = robot.boundRect.point1.x;
+            double x12 = robot.boundRect.point2.x;
+            double y11 = robot.boundRect.point1.y;
+            double y12 = robot.boundRect.point2.y;
+            bool res = false;
+
+            foreach (Barrier barrier in barrierList)
+            {
+                double x21 = barrier.boundRect.point1.x;
+                double x22 = barrier.boundRect.point2.x;
+                double y21 = barrier.boundRect.point1.y;
+                double y22 = barrier.boundRect.point2.y;
+
+                res = x21 < x12 && x22 > x12 && y22 > y11 && y21 < y12 ||
+                      x11 < x22 && x12 > x21 && y12 > y21 && y11 < y22;
+
+                if (res)
+                {
+                    return barrier;
+                }
+                     
+            }
+
+            return null;
+        }
+
+        public void collisionTest()
+        {
+            Barrier barrier = intersection();
+
+            if (barrier != null)
+            {
+                // do something
+            }
         }
 
     }

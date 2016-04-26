@@ -54,6 +54,7 @@
     <Compile Include="DummyRobot.cs" />
     <Compile Include="DynamicCompiler.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MathLib\Rect.cs" />
     <Compile Include="MathLib\Vector3.cs" />
     <Compile Include="Objects\Barrier.cs" />
     <Compile Include="Objects\Plane.cs" />
