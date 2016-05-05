@@ -31,7 +31,7 @@ namespace RoboServer.lib
             
         }
 
-        public void SendSource(int UserID, string Source)
+        public void SendSource(int UserID, string Source, string MainClass)
         {
             
         }

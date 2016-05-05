@@ -7,7 +7,7 @@ using RoboLab.MathLib;
 
 namespace RoboLab.Objects
 {
-    class Plane : SceneObject
+    public class Plane : SceneObject
     {
         public Plane()
         {

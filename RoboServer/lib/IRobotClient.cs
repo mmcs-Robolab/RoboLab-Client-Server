@@ -10,7 +10,7 @@ namespace RoboServer.lib
     {
         void BindUserRobot(int UserID, string Robot);
 
-        void SendSource(int UserID, string Source);
+        void SendSource(int UserID, string Source, string MainClass);
 
         void CommandRobot(int UserID, string Command);
 

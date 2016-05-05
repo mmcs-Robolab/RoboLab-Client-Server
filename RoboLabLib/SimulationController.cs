@@ -11,7 +11,7 @@ using System.Web.Script.Serialization;
 
 namespace RoboLab
 {
-    class SimulationController
+    public class SimulationController
     {
         private static System.Timers.Timer aTimer;
         
@@ -39,6 +39,11 @@ namespace RoboLab
         public void setRobot(VirtualRobot robot)
         {
             this.robot = robot;
+        }
+
+        public VirtualRobot getRobot()
+        {
+            return robot;
         }
 
         public void StartSimulation()

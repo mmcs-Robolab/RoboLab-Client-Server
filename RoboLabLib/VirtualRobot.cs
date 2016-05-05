@@ -7,7 +7,7 @@ using RoboLab.MathLib;
 
 namespace RoboLab
 {
-    class VirtualRobot : BaseRobot
+    public class VirtualRobot : BaseRobot
     {
         public Vector3 velocity;
         public Vector3 position;
@@ -44,50 +44,32 @@ namespace RoboLab
                                  new Vector3(position.x + width/2, position.y, position.z + depth/2));
         }
 
-        public override void MoveForward(double paramVelocity)
+        public override void BeginMoveForward(double paramVelocity)
         {
             this.velocity = direction;
             this.velocity.multiplyScalar(paramVelocity * speedCoef);
         }
 
-        public override void MoveBackward(double paramVelocity)
+        public override void BeginMoveBackward(double paramVelocity)
         {
             this.velocity = direction;
             this.velocity.multiplyScalar(-paramVelocity * speedCoef);
         }
 
-        public override void StartMoveBackward(double distance)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public override void StartMoveForward(double distance)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void TurnLeft(double angle)
+        public override void BeginTurnLeft(double angle)
         {
             direction.rotateOnY(angle);
             boundRect.rotate(angle);
         }
 
-        public override void TurnRight(double angle)
+        public override void BeginTurnRight(double angle)
         {
             direction.rotateOnY(-angle);
             boundRect.rotate(angle);
         }
-
-        public override void StartTurnLeft(double angle)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void StartTurnRight(double angle)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public override void Stop()
         {
             velocity = new Vector3();
@@ -98,6 +80,17 @@ namespace RoboLab
             this.width = width;
             this.height = height;
             this.depth = depth;
+        }
+        
+
+        public override void BeginGetSensorValue(SensorType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double[] GetSensorValue(SensorType type)
+        {
+            throw new NotImplementedException();
         }
     }
 }

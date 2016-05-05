@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoboLab.MathLib
 {
-    class Rect
+    public class Rect
     {
         public Vector3 center;
         public Vector3 point1;

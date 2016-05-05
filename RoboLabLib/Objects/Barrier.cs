@@ -7,7 +7,7 @@ using RoboLab.MathLib;
 
 namespace RoboLab.Objects
 {
-    class Barrier : SceneObject
+    public class Barrier : SceneObject
     {
         public Rect boundRect;
 

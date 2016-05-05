@@ -44,6 +44,16 @@ namespace RoboLab
             robots[name].Robot = new Robot(robot);
         }
 
+        public Robot GetUserRobot(int UserID)
+        {
+            return robots[usersRobots[UserID]].Robot;
+        }
+
+        public String GetUserRobotName(int UserID)
+        {
+            return usersRobots[UserID];
+        }
+
         public bool BindUser(int userID, string robot)
         {
             if (usersRobots.ContainsKey(userID) || usersRobots.ContainsValue(robot))
@@ -51,6 +61,8 @@ namespace RoboLab
             usersRobots[userID] = robot;
             return true;
         }
+
+        
 
         public void RunRobot(String name, Type RobotType, bool trusted = false)
         {

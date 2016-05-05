@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoboLab.MathLib
 {
-    class Vector3
+    public class Vector3
     {
         public double x;
         public double y;

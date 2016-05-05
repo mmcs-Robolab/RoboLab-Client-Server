@@ -7,7 +7,7 @@ using RoboLab.MathLib;
 
 namespace RoboLab.Objects
 {
-    class SceneObject
+    public class SceneObject
     {
         public string name;
         public int id;
