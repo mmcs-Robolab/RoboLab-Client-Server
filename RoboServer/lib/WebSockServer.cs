@@ -82,8 +82,8 @@ namespace RoboServer.lib
                     connection.message = message;
                     //parseMessage(message, socket);
                     // allSockets.ToList().ForEach(s => s.Send("Echo: " + message));
-                    if (Connected != null)
-                        Connected(this, new WebConnectionEventArgs(connection));
+                    if (MessageReceived != null)
+                        MessageReceived(this, new WebConnectionEventArgs(connection));
                 };
             });
         }
