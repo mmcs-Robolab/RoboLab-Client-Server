@@ -53,12 +53,17 @@ namespace RoboServer.lib
             
         }
 
-        private int getNextId()
+        public int getNextId()
         {
             if (freeIds.Count > 0)
                 return freeIds.Dequeue();
             else
                 return idCounter++;
+        }
+
+        public void returnId(int id)
+        {
+            freeIds.Enqueue(id);
         }
 
         // настраиваем и запускаем сервер

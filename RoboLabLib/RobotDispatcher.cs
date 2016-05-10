@@ -30,7 +30,10 @@ namespace RoboLab
             stopwatch = new Stopwatch();
             stopwatch.Start();
         }
-
+        public IEnumerable<string> GetRobots()
+        {
+            return robots.Keys;
+        }
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             foreach (KeyValuePair<string, RobotThreadWrapper> p in robots)
@@ -64,7 +67,7 @@ namespace RoboLab
 
         
 
-        public void RunRobot(String name, Type RobotType, bool trusted = false)
+        public string RunRobot(String name, Type RobotType, bool trusted = false)
         {
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             robots[name].Finish();
@@ -88,10 +91,10 @@ namespace RoboLab
             robots[name].SetBaseRobot(RobotType, baseRobot);
             robots[name].Robot.PrintMessage += Robot_PrintMessage;
             robots[name].RunRobotAsync();
-
+            return "Success";
             //System.Environment.StackTrace
         }
-        public void RunRobot(String name, String source, String mainClass)
+        public string RunRobot(String name, String source, String mainClass)
         {
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             //if(robots[name].Robot != null)
@@ -116,6 +119,7 @@ namespace RoboLab
             }
             else
                 robots[name].SetBaseRobot(typeof(Robot), baseRobot);
+            return s;
         }
         
 

@@ -14,7 +14,7 @@ namespace RoboServer.lib
 
         void CommandRobot(int UserID, string Command);
 
-        void GetRobots();
+        void GetRobots(int UserID);
 
         event ReceiveMessagehandler ReceiveMessage;
     }

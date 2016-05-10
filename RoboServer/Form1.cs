@@ -82,23 +82,84 @@ namespace RoboServer
         {
             appendWebSockLogBox("Message sent to " + args.Connection.userID);
         }
+       
+        private IEnumerable<string> getServerList()
+        {
+            return robotClients.Keys.Select(x => x.ToString());
+
+        }
+
+        private void processMessage(int userID, string message)
+        {
+            string[] messageParts = message.Split('#');
+            if (messageParts.Length == 0)
+                return;
+            switch (messageParts[0])
+            {
+                case "listServers":
+                    webSocketServer.MessageUser(userID, String.Join("#", getServerList()));
+                    break;
+                case "chooseServer":
+                    int server;
+                    if (messageParts.Length < 2 || int.TryParse(messageParts[1], out server))
+                        webSocketServer.MessageUser(userID, "chosenServer#Failure");
+                    else
+                    {
+                        userBindings[userID] = server;
+                        webSocketServer.MessageUser(userID, "chosenServer#Success");
+                    }
+                    break;
+                case "createSimulation":
+                    int id = socketServer.getNextId();
+                    robotClients[id] = new VirtualClient();
+                    userBindings[userID] = id;
+                    webSocketServer.MessageUser(userID, "creationResult#..."); //
+                    break;
+                case "listRobots":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))
+                        webSocketServer.MessageUser(userID, "robots#Failure");
+                    else
+                        robotClients[userBindings[userID]].GetRobots(userID);
+                    break;
+                case "bindToRobot":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
+                        webSocketServer.MessageUser(userID, "bindingResult#Failure");
+                    else
+                        robotClients[userBindings[userID]].BindUserRobot(userID, messageParts[1]);
+                    break;
+                case "messageRobot":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
+                        webSocketServer.MessageUser(userID, "messageRobot#Failure");
+                    else
+                        robotClients[userBindings[userID]].CommandRobot(userID, messageParts[1]);
+                    break;
+                case "compileRobot":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 3)
+                        webSocketServer.MessageUser(userID, "compilationResult#Failure");
+                    else
+                        robotClients[userBindings[userID]].SendSource(userID, String.Concat(messageParts.Skip(2)), messageParts[1]);
+                    break;
+                case "pauseSimulation":
+                    if(!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || !(robotClients[userBindings[userID]] is VirtualClient))
+                        webSocketServer.MessageUser(userID, "pauseSimulation#Failure");
+                    else
+                        (robotClients[userBindings[userID]] as VirtualClient).StopSimulation();
+                    break;
+                case "resumeSimulation":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || !(robotClients[userBindings[userID]] is VirtualClient))
+                        webSocketServer.MessageUser(userID, "resumeSimulation#Failure");
+                    else
+                        (robotClients[userBindings[userID]] as VirtualClient).StartSimulation();
+                    break;
+            }
+        }
 
         private void WebSocketServer_MessageReceived(object sender, WebConnectionEventArgs args)
         {
             appendWebSockLogBox("Message \"" + args.Connection.message + "\" received by " + args.Connection.userID);
-            string[] parts = args.Connection.message.Split('#');
-            if (parts.Count() == 0)
-                return;
-            switch(parts[0])
-            {
-                case "bindToClient":
-                    int clientID;
-                    if(int.TryParse(parts[1], out clientID))
-                    {
-                        
-                    }
-                    break;
-            }
+            
+            processMessage(args.Connection.userID, args.Connection.message);
+            
         }
 
         private void WebSocketServer_Disconnected(object sender, WebConnectionEventArgs args)

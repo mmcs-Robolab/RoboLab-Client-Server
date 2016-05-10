@@ -47,6 +47,8 @@ namespace RoboLab
 
         public event PrintEventHandler PrintMessage;
 
+        public event ReceiveEventHandler ReceiveMessage;
+
         public Robot()
         {
 
@@ -65,6 +67,12 @@ namespace RoboLab
         public Robot(BaseRobot baseRobot)
         {
             this.baseRobot = baseRobot;
+        }
+
+        public void Receive(string msg)
+        {
+            if (ReceiveMessage != null)
+                ReceiveMessage(this, new ReceiveEventArgs(msg));
         }
 
         public void Print(IFormattable msg)
@@ -187,6 +195,15 @@ namespace RoboLab
         }
     }
     [Serializable]
+    public class ReceiveEventArgs : EventArgs
+    {
+        public string Message { get; set; }
+        public ReceiveEventArgs(string msg = "")
+        {
+            Message = msg;
+        }
+    }
+    [Serializable]
     public class SleepEventArgs : EventArgs
     {
         public double Time { get; set; }
@@ -195,6 +212,7 @@ namespace RoboLab
             Time = time;
         }
     }
+    public delegate void ReceiveEventHandler(object sender, ReceiveEventArgs args);
 
     public delegate void PrintEventHandler(object sender, PrintEventArgs args);
 
