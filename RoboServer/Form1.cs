@@ -59,28 +59,31 @@ namespace RoboServer
 
         private void SocketServer_MessageSent(object sender, ConnectionEventArgs args)
         {
-            appendSockLogBox("Message sent from "+args.Connection.selfID);
+            this.Invoke(() => appendSockLogBox("Message sent from " + args.Connection.selfID));
         }
 
         private void SocketServer_MessageReceived(object sender, ConnectionEventArgs args)
         {
-            appendSockLogBox("Message \"" + args.Connection.command + "\" received by " + args.Connection.selfID);
+            this.Invoke(() => appendSockLogBox("Message \"" + args.Connection.command + "\" received by " + args.Connection.selfID));
         }
 
         private void SocketServer_Disconnected(object sender, ConnectionEventArgs args)
         {
-            appendSockLogBox(args.Connection.selfID + " disconnected");
+            this.Invoke(() => appendSockLogBox(args.Connection.selfID + " disconnected"));
         }
 
         private void SocketServer_Connected(object sender, ConnectionEventArgs args)
         {
-            appendSockLogBox(args.Connection.selfID + " connected");
-            robotClients[args.Connection.selfID] = new RobotClientProxy();
+            this.Invoke(()=>
+            {
+                appendSockLogBox(args.Connection.selfID + " connected");
+                robotClients[args.Connection.selfID] = new RobotClientProxy();
+            });
         }
 
         private void WebSocketServer_MessageSent(object sender, WebConnectionEventArgs args)
         {
-            appendWebSockLogBox("Message sent to " + args.Connection.userID);
+            this.Invoke(()=>appendWebSockLogBox("Message sent to " + args.Connection.userID));
         }
        
         private IEnumerable<string> getServerList()
@@ -156,20 +159,28 @@ namespace RoboServer
 
         private void WebSocketServer_MessageReceived(object sender, WebConnectionEventArgs args)
         {
-            appendWebSockLogBox("Message \"" + args.Connection.message + "\" received by " + args.Connection.userID);
-            
-            processMessage(args.Connection.userID, args.Connection.message);
+            this.Invoke(() =>
+            {
+                appendWebSockLogBox("Message \"" + args.Connection.message + "\" received by " + args.Connection.userID);
+
+                processMessage(args.Connection.userID, args.Connection.message);
+            });
             
         }
 
         private void WebSocketServer_Disconnected(object sender, WebConnectionEventArgs args)
         {
-            appendWebSockLogBox(args.Connection.userID + " disconnected");
+            this.Invoke(()=>appendWebSockLogBox(args.Connection.userID + " disconnected"));
         }
 
         private void WebSocketServer_Connected(object sender, WebConnectionEventArgs args)
         {
-            appendWebSockLogBox(args.Connection.userID + " connected");
+            this.Invoke(()=>appendWebSockLogBox(args.Connection.userID + " connected"));
+        }
+
+        private void Invoke(Action a)
+        {
+            this.Invoke((Delegate)a);
         }
 
         public void appendWebSockLogBox(string txt)
