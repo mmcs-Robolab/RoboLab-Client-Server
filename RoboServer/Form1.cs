@@ -117,6 +117,7 @@ namespace RoboServer
                     robotClients[id] = new VirtualClient();
                     userBindings[userID] = id;
                     webSocketServer.MessageUser(userID, "creationResult#..."); //
+                    robotClients[id].BindUserRobot(userID, "simulated");
                     break;
                 case "listRobots":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))
@@ -185,12 +186,12 @@ namespace RoboServer
 
         public void appendWebSockLogBox(string txt)
         {
-            logWebSocketText.AppendText(txt);
+            logWebSocketText.AppendText(txt+Environment.NewLine);
         }
 
         public void appendSockLogBox(string txt)
         {
-            logSocketText.AppendText(txt);
+            logSocketText.AppendText(txt + Environment.NewLine);
         }
 
         public void changeLogBoxColor(Color clr)

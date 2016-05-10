@@ -29,6 +29,7 @@ namespace RoboLab
             timer.Start();
             stopwatch = new Stopwatch();
             stopwatch.Start();
+            usersRobots = new Dictionary<int, string>();
         }
         public IEnumerable<string> GetRobots()
         {
