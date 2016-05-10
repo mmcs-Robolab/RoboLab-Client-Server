@@ -32,7 +32,7 @@ namespace RoboServer.lib
 
         private void Dispatcher_DispatcherPrint(object sender, DispatcherPrintEventArgs args)
         {
-            onReceiveMessage(args.UserID, args.Message);
+            onReceiveMessage(args.UserID, "messageFromRobot#"+args.Message);
         }
 
         public void BindUserRobot(int UserID, string Robot)
