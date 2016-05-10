@@ -39,7 +39,7 @@ namespace RoboLab
 
         public string SetBaseRobot(String source, String mainClass, BaseRobot baseRobot)
         {
-            dynamic classRef = DynamicCompiler.Compile(source, mainClass, new Object[] { });
+            dynamic classRef;
             try
             {
                 classRef = DynamicCompiler.Compile(source, mainClass, new Object[] { });

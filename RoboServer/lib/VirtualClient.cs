@@ -27,6 +27,12 @@ namespace RoboServer.lib
             dispatcher = new RobotDispatcher();
             simulation = new SimulationController();
             dispatcher.AddBaseRobot("simulated", simulation.getRobot());
+            dispatcher.DispatcherPrint += Dispatcher_DispatcherPrint;
+        }
+
+        private void Dispatcher_DispatcherPrint(object sender, DispatcherPrintEventArgs args)
+        {
+            onReceiveMessage(args.UserID, args.Message);
         }
 
         public void BindUserRobot(int UserID, string Robot)
@@ -49,7 +55,9 @@ namespace RoboServer.lib
 
         public void SendSource(int UserID, string Source, string MainClass)
         {
-            onReceiveMessage(UserID, "compilationResult#"+dispatcher.RunRobot(dispatcher.GetUserRobotName(UserID), Source, MainClass));
+            string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(UserID), Source, MainClass);
+            onReceiveMessage(UserID, "compilationResult#"+result);
+            Logger.Log(result, this);
         }
 
         public void StartSimulation()

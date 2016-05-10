@@ -115,6 +115,7 @@ namespace RoboServer
                 case "createSimulation":
                     int id = socketServer.getNextId();
                     robotClients[id] = new VirtualClient();
+                    robotClients[id].ReceiveMessage += MainForm_ReceiveMessage;
                     userBindings[userID] = id;
                     webSocketServer.MessageUser(userID, "creationResult#..."); //
                     robotClients[id].BindUserRobot(userID, "simulated");
@@ -156,6 +157,11 @@ namespace RoboServer
                         (robotClients[userBindings[userID]] as VirtualClient).StartSimulation();
                     break;
             }
+        }
+
+        private void MainForm_ReceiveMessage(object sender, MessageEventArgs args)
+        {
+            webSocketServer.MessageUser(args.UserID, args.Message);
         }
 
         private void WebSocketServer_MessageReceived(object sender, WebConnectionEventArgs args)

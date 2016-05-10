@@ -16,6 +16,8 @@ namespace RoboLab
 {
     public class RobotDispatcher : MarshalByRefObject
     {
+        public event DispatcherPrintEventHandler DispatcherPrint;
+
         Dictionary<String, RobotThreadWrapper> robots;
         Dictionary<int, String> usersRobots;
         System.Timers.Timer timer;
@@ -136,6 +138,26 @@ namespace RoboLab
         private void Robot_PrintMessage(object sender, PrintEventArgs args)
         {
             Logger.Log(args.Message, sender);
+            string robotName = robots.First(x => x.Value.Robot == (Robot)sender).Key;
+
+            int userID = usersRobots.First(x => x.Value == robotName).Key;
+
+            if (DispatcherPrint != null)
+                DispatcherPrint(this, new DispatcherPrintEventArgs(userID, args.Message));
+
         }
     }
+    
+    public class DispatcherPrintEventArgs : EventArgs
+    {
+        public string Message { get; set; }
+        public int UserID { get; set; }
+        public DispatcherPrintEventArgs(int userID, string message = "")
+        {
+            UserID = userID;
+            Message = message;
+        }
+    }
+
+    public delegate void DispatcherPrintEventHandler(Object sender, DispatcherPrintEventArgs args);
 }
