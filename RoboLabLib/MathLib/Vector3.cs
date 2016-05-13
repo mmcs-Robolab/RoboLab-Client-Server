@@ -51,9 +51,14 @@ namespace RoboLab.MathLib
             return x == 0 && y == 0 && z == 0;
         }
 
-        public bool isDifferentDirection(Vector3 vec)
+        public bool isReverseDirection(Vector3 vec)
         {
             return x == -vec.x && y == -vec.y && z == -vec.z;
+        }
+
+        public bool isDifferentDirection(Vector3 vec)
+        {
+            return x != vec.x || y != vec.y || z != vec.z;
         }
 
     }

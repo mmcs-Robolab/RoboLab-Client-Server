@@ -24,11 +24,14 @@ namespace RoboLab
         }
 
         private List<PosPoint> pointList = new List<PosPoint>();
+
+        private Vector3 oldDirection = new Vector3();
         
         // Scene
         private List<Barrier> barrierList;
         private Plane plane;
         private VirtualRobot robot;
+
 
 
         public SimulationController()
@@ -73,22 +76,27 @@ namespace RoboLab
 
         public void saveCurPosition()
         {
-            string moveType;
-
-            if (robot.velocity.isDifferentDirection(robot.direction))
+            if (robot.direction.isDifferentDirection(oldDirection))
             {
-                moveType = "backward";
-            }
-            else
-            {
-                moveType = "forward";
-            }
-            
-            PosPoint point = new PosPoint();
-            point.moveType = moveType;
-            point.point = robot.position;
+                string moveType;
 
-            pointList.Add(point);
+                if (robot.velocity.isReverseDirection(robot.direction))
+                {
+                    moveType = "backward";
+                }
+                else
+                {
+                    moveType = "forward";
+                }
+
+                PosPoint point = new PosPoint();
+                point.moveType = moveType;
+                point.point = robot.position;
+
+                pointList.Add(point);
+
+                oldDirection = robot.direction;
+            }
 
 
         }
