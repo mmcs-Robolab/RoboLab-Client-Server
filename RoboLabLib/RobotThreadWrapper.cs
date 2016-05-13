@@ -15,6 +15,9 @@ namespace RoboLab
         public bool Trusted;
         public string Name;
         Thread t;
+        
+        public event PrintEventHandler PrintMessage;
+
         public RobotThreadWrapper()
         {
             barrier = new Barrier(2);
@@ -76,17 +79,29 @@ namespace RoboLab
             set
             {
                 this.robot = value;
-
+                robot.PrintMessage += Robot_PrintMessage;
                 robot.FellAsleep += Robot_FellAsleep;
                 robot.WokeUp += Robot_WokeUp;
                 robot.Crashed += Robot_Crashed;
             }
         }
 
+        private void Print(string message)
+        {
+            if (PrintMessage != null)
+                PrintMessage(this, new PrintEventArgs(message));
+        }
+
+        private void Robot_PrintMessage(object sender, PrintEventArgs args)
+        {
+            if(PrintMessage != null)
+                PrintMessage(this, args);
+        }
+
         private void Robot_Crashed(object sender, CrashedEventArgs args)
         {
             Exception e = args.Exception.InnerException;
-            robot.Print(e.Source + ": " + e.Message);
+            Print(e.Source + ": " + e.Message);
             Finish();
         }
 
@@ -95,6 +110,8 @@ namespace RoboLab
             try
             {
                 robot.SetBaseRobot(null);
+
+                robot.PrintMessage -= Robot_PrintMessage;
                 robot.FellAsleep -= Robot_FellAsleep;
                 robot.WokeUp -= Robot_WokeUp;
                 robot.Crashed -= Robot_Crashed;
@@ -106,7 +123,7 @@ namespace RoboLab
             catch (Exception ee)
             {
                 if (ee != null)
-                    robot.Print(ee.Message);
+                    Print(ee.Message);
             }
             
             if (!Trusted)
@@ -119,7 +136,7 @@ namespace RoboLab
                 catch (Exception ee)
                 {
                     if(ee != null)
-                        robot.Print(ee.Message);
+                        Print(ee.Message);
                 }
             }
         }
@@ -144,7 +161,7 @@ namespace RoboLab
             }
             catch(Exception e)
             {
-                Robot.Print(e.Message);
+                Print(e.Message);
             }
         }
         public void RunRobotAsync()

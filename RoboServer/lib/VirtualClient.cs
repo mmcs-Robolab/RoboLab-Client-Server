@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using RoboLab;
 
 namespace RoboServer.lib
 {
-    class VirtualClient : IRobotClient
+    class VirtualClient : RobotClient
     {
-        public event ReceiveMessagehandler ReceiveMessage;
+        public override event ReceiveMessagehandler ReceiveMessage;
 
         RobotDispatcher dispatcher;
         SimulationController simulation;
 
-
+        Timer updateTimer;
 
         private void onReceiveMessage(int UserID, string message)
         {
@@ -28,6 +29,17 @@ namespace RoboServer.lib
             simulation = new SimulationController();
             dispatcher.AddBaseRobot("simulated", simulation.getRobot());
             dispatcher.DispatcherPrint += Dispatcher_DispatcherPrint;
+            updateTimer = new Timer(1000);
+            updateTimer.AutoReset = true;
+            updateTimer.Elapsed += UpdateTimer_Elapsed;
+            updateTimer.Start();
+        }
+
+        private void UpdateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            string message = "simulationPoints#"+String.Join("#", simulation.getPoints().Select(p => String.Format("{0}#{1}#{2}#{3}", p.point.x, p.point.y, p.point.z, p.moveType)));
+            foreach (int user in Users)
+                onReceiveMessage(user, message);
         }
 
         private void Dispatcher_DispatcherPrint(object sender, DispatcherPrintEventArgs args)
@@ -35,7 +47,7 @@ namespace RoboServer.lib
             onReceiveMessage(args.UserID, "messageFromRobot#"+args.Message);
         }
 
-        public void BindUserRobot(int UserID, string Robot)
+        public override void BindUserRobot(int UserID, string Robot)
         {
             if (dispatcher.BindUser(UserID, Robot))
                 onReceiveMessage(UserID, "bindingResult#Success");
@@ -43,17 +55,17 @@ namespace RoboServer.lib
                 onReceiveMessage(UserID, "bindingResult#Failure");
         }
 
-        public void CommandRobot(int UserID, string Command)
+        public override void CommandRobot(int UserID, string Command)
         {
             dispatcher.GetUserRobot(UserID).Receive(Command);
         }
 
-        public void GetRobots(int UserID)
+        public override void GetRobots(int UserID)
         {
             onReceiveMessage(UserID, String.Join("#", dispatcher.GetRobots()));
         }
 
-        public void SendSource(int UserID, string Source, string MainClass)
+        public override void SendSource(int UserID, string Source, string MainClass)
         {
             string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(UserID), Source, MainClass);
             onReceiveMessage(UserID, "compilationResult#"+result);

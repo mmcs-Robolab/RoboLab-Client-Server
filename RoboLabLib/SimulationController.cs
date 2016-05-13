@@ -17,7 +17,7 @@ namespace RoboLab
         
 
         // Data for save
-        struct PosPoint
+        public struct PosPoint
         {
             public Vector3 point;
             public string moveType;
@@ -72,6 +72,16 @@ namespace RoboLab
         {
             robot.position.add(robot.velocity);
             saveCurPosition();
+        }
+
+        public List<PosPoint> getPoints()
+        {
+            return pointList.ToList();
+        }
+
+        public void clearPoints()
+        {
+            pointList.Clear();
         }
 
         public void saveCurPosition()

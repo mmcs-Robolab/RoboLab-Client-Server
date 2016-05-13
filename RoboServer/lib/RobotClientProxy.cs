@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace RoboServer.lib
 {
-    class RobotClientProxy : IRobotClient
+    class RobotClientProxy : RobotClient
     {
 
-        public event ReceiveMessagehandler ReceiveMessage;
+        public override event ReceiveMessagehandler ReceiveMessage;
 
-        public void BindUserRobot(int UserID, string Robot)
+        public override void BindUserRobot(int UserID, string Robot)
         {
             
         }
@@ -21,17 +21,17 @@ namespace RoboServer.lib
 
         }
 
-        public void CommandRobot(int UserID, string Command)
+        public override void CommandRobot(int UserID, string Command)
         {
             
         }
 
-        public void GetRobots(int UserID)
+        public override void GetRobots(int UserID)
         {
             
         }
 
-        public void SendSource(int UserID, string Source, string MainClass)
+        public override void SendSource(int UserID, string Source, string MainClass)
         {
             
         }

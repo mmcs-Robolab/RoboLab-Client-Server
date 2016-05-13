@@ -20,7 +20,7 @@ namespace RoboServer
         WebSockServer webSocketServer;
         Dictionary<int, int> userBindings;
 
-        Dictionary<int, IRobotClient> robotClients;
+        Dictionary<int, RobotClient> robotClients;
 
         public MainForm()
         {
@@ -38,7 +38,7 @@ namespace RoboServer
         private void createSockServerBtn_Click(object sender, EventArgs e)
         {
             userBindings = new Dictionary<int, int>();
-            robotClients = new Dictionary<int, IRobotClient>();
+            robotClients = new Dictionary<int, RobotClient>();
 
             webSocketServer = new WebSockServer(ip, getWebSocketPort());
             webSocketServer.Start();
@@ -109,6 +109,7 @@ namespace RoboServer
                     else
                     {
                         userBindings[userID] = server;
+                        robotClients[server].Users.Add(userID);
                         webSocketServer.MessageUser(userID, "chosenServer#Success");
                     }
                     break;
@@ -119,6 +120,7 @@ namespace RoboServer
                     userBindings[userID] = id;
                     webSocketServer.MessageUser(userID, "creationResult#..."); //
                     robotClients[id].BindUserRobot(userID, "simulated");
+                    robotClients[id].Users.Add(userID);
                     break;
                 case "listRobots":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))

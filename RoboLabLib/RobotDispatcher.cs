@@ -20,6 +20,8 @@ namespace RoboLab
 
         Dictionary<String, RobotThreadWrapper> robots;
         Dictionary<int, String> usersRobots;
+        Dictionary<String, int> robotsUsers;
+
         System.Timers.Timer timer;
         Stopwatch stopwatch;
         public RobotDispatcher()
@@ -32,6 +34,7 @@ namespace RoboLab
             stopwatch = new Stopwatch();
             stopwatch.Start();
             usersRobots = new Dictionary<int, string>();
+            robotsUsers = new Dictionary<string, int>();
         }
         public IEnumerable<string> GetRobots()
         {
@@ -47,6 +50,8 @@ namespace RoboLab
         public void AddBaseRobot(string name, BaseRobot robot)
         {
             robots[name] = new RobotThreadWrapper();
+            robots[name].Name = name;
+            robots[name].PrintMessage += Robot_PrintMessage;
             robots[name].Robot = new Robot(robot);
         }
 
@@ -65,6 +70,7 @@ namespace RoboLab
             if (usersRobots.ContainsKey(userID) || usersRobots.ContainsValue(robot))
                 return false;
             usersRobots[userID] = robot;
+            robotsUsers[robot] = userID;
             return true;
         }
 
@@ -91,8 +97,9 @@ namespace RoboLab
             }
             else
                 robots[name] = new RobotThreadWrapper();
+            robots[name].Name = name;
+            robots[name].PrintMessage += Robot_PrintMessage;
             robots[name].SetBaseRobot(RobotType, baseRobot);
-            robots[name].Robot.PrintMessage += Robot_PrintMessage;
             robots[name].RunRobotAsync();
             return "Success";
             //System.Environment.StackTrace
@@ -108,12 +115,12 @@ namespace RoboLab
             robots[name] = (RobotThreadWrapper)appDomain.CreateInstanceAndUnwrap(
                 Assembly.GetAssembly(typeof(Robot)).FullName,
                 "RoboLab.RobotThreadWrapper");
-
+            robots[name].PrintMessage += Robot_PrintMessage;
+            robots[name].Name = name;
             string s = robots[name].SetBaseRobot(source, mainClass, baseRobot);
             Logger.Log(s);
             if (s == "Success")
             {
-                robots[name].Robot.PrintMessage += Robot_PrintMessage;
                 robots[name].RunRobotAsync();
 
                 //Test only
@@ -132,15 +139,15 @@ namespace RoboLab
             robots[name].Finish();
             AppDomain.Unload(robots[name].GetAppDomain());
             robots[name] = new RobotThreadWrapper();
+            robots[name].PrintMessage += Robot_PrintMessage;
             robots[name].SetBaseRobot(typeof(Robot), baseRobot);
         }
 
         private void Robot_PrintMessage(object sender, PrintEventArgs args)
         {
             Logger.Log(args.Message, sender);
-            string robotName = robots.First(x => x.Value.Robot == (Robot)sender).Key;
-
-            int userID = usersRobots.First(x => x.Value == robotName).Key;
+            
+            int userID = robotsUsers[((RobotThreadWrapper)sender).Name];
 
             if (DispatcherPrint != null)
                 DispatcherPrint(this, new DispatcherPrintEventArgs(userID, args.Message));

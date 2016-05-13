@@ -6,17 +6,24 @@ using System.Threading.Tasks;
 
 namespace RoboServer.lib
 {
-    interface IRobotClient
+    abstract class RobotClient
     {
-        void BindUserRobot(int UserID, string Robot);
+        public SortedSet<int> Users;
 
-        void SendSource(int UserID, string Source, string MainClass);
+        public RobotClient()
+        {
+            Users = new SortedSet<int>();
+        }
 
-        void CommandRobot(int UserID, string Command);
+        public abstract void BindUserRobot(int UserID, string Robot);
 
-        void GetRobots(int UserID);
+        public abstract void SendSource(int UserID, string Source, string MainClass);
 
-        event ReceiveMessagehandler ReceiveMessage;
+        public abstract void CommandRobot(int UserID, string Command);
+
+        public abstract void GetRobots(int UserID);
+
+        public abstract event ReceiveMessagehandler ReceiveMessage;
     }
 
     public class MessageEventArgs : EventArgs
