@@ -35,6 +35,11 @@ namespace RoboServer.lib
             updateTimer.Start();
         }
 
+        public void ImportScene(string scene)
+        {
+            simulation.importSceneFromJson(scene);
+        }
+
         private void UpdateTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             string message = "simulationPoints#"+String.Join("#", simulation.getPoints().Select(p => String.Format("{0}#{1}#{2}#{3}", p.point.x, p.point.y, p.point.z, p.moveType)));

@@ -121,6 +121,8 @@ namespace RoboServer
                     webSocketServer.MessageUser(userID, "creationResult#..."); //
                     robotClients[id].BindUserRobot(userID, "simulated");
                     robotClients[id].Users.Add(userID);
+                    ((VirtualClient)robotClients[id]).ImportScene(String.Concat(messageParts.Skip(1)));
+                    ((VirtualClient)robotClients[id]).StartSimulation();
                     break;
                 case "listRobots":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))
