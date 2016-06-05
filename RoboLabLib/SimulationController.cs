@@ -70,7 +70,12 @@ namespace RoboLab
 
         public void updatePosition()
         {
-            robot.position.add(robot.velocity);
+            //robot.position.add(robot.velocity);
+            robot.direction.rotateOnY(robot.lateralVelocity);
+            Vector3 v = robot.direction.Clone();
+            v.multiplyScalar(robot.velocity);
+            robot.position.add(v);
+
             saveCurPosition();
         }
 
@@ -90,7 +95,7 @@ namespace RoboLab
             {
                 string moveType;
 
-                if (robot.velocity.isReverseDirection(robot.direction))
+                if (robot.velocity < 0)//robot.velocity.isReverseDirection(robot.direction))
                 {
                     moveType = "backward";
                 }

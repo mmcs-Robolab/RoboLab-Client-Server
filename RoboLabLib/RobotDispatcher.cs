@@ -132,12 +132,23 @@ namespace RoboLab
             return s;
         }
         
+        public void UnbindUser(int UserID)
+        {
+            if(usersRobots.ContainsKey(UserID))
+            {
+                string robot = usersRobots[UserID];
+                StopRobot(robot);
+                usersRobots.Remove(UserID);
+                robotsUsers.Remove(robot);
+            }
+        }
 
         public void StopRobot(String name)
         {
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             robots[name].Finish();
-            AppDomain.Unload(robots[name].GetAppDomain());
+            if(!robots[name].Trusted)
+                AppDomain.Unload(robots[name].GetAppDomain());
             robots[name] = new RobotThreadWrapper();
             robots[name].PrintMessage += Robot_PrintMessage;
             robots[name].SetBaseRobot(typeof(Robot), baseRobot);

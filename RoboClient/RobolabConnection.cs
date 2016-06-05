@@ -21,11 +21,14 @@ namespace RoboClient
         private Socket sClient;
 
         //  Флажок установленного соединения
-        public bool connected
+        public bool IsConnected
         {
             get; private set;
         } = false;
-
+        public bool IsAuthorised
+        {
+            get; private set;
+        } = false;
         private string pointName;
         private string userName;
         //private List<Device> deviceList;
@@ -43,33 +46,35 @@ namespace RoboClient
         {
 
         }
-
+        
         private void onConnected()
         {
             if (Connected != null)
                 Connected(this, new EventArgs());
-            connected = true;
+            IsConnected = true;
         }
         private void onConnectFailed()
         {
             if (ConnectFailed != null)
                 ConnectFailed(this, new EventArgs());
-            connected = false;
+            IsConnected = false;
         }
         private void onDisconnected()
         {
             if (Disconnected != null)
                 Disconnected(this, new EventArgs());
-            connected = false;
+            IsConnected = false;
         }
         private void onAuthorised()
         {
+            IsAuthorised = true;
             if (Authorised != null)
                 Authorised(this, new EventArgs());
         }
 
         private void onAuthoriseFailed()
         {
+            IsAuthorised = false;
             if (AuthoriseFailed != null)
                 AuthoriseFailed(this, new EventArgs());
         }
@@ -132,6 +137,8 @@ namespace RoboClient
         {
             Logger.Log("Данные отправлены",this);
             //  тут начать слушание сервера пока не отключились
+            sClient.EndSend(ar);
+
         }
 
 
@@ -157,7 +164,7 @@ namespace RoboClient
 
         public void Send(String message)
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(message + Environment.NewLine);
+            byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
             sClient.BeginSend(sendBuffer, 0, sendBuffer.Length, 0, new AsyncCallback(SendCallback), sClient);
         }
 
@@ -180,58 +187,61 @@ namespace RoboClient
             webRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
             webRequest.Referer = "195.208.237.193:3000";
 
-            StreamWriter requestWriter = new StreamWriter(webRequest.GetRequestStream());
-            requestWriter.Write(postString);
-            requestWriter.Close();
-
-            try
+            webRequest.GetRequestStreamAsync().ContinueWith(s =>
             {
-                using (WebResponse response = webRequest.GetResponse())
-                {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://195.208.237.193:3000/auth/userInfo");//"http://192.168.0.125:3000/auth/userInfo"); // и тут тоже
-                    request.CookieContainer = cookies;
-                    HttpWebResponse responseUserInfo = (HttpWebResponse)request.GetResponse();
-                    if (responseUserInfo.StatusCode == HttpStatusCode.Forbidden)
-                    {
-                        Logger.Log("Невозможно получить данные пользователя", this);
-                    }
-                    else if (responseUserInfo.StatusCode == HttpStatusCode.OK)
-                    {
-                        var encoding = Encoding.UTF8;
-                        using (var reader = new System.IO.StreamReader(responseUserInfo.GetResponseStream(), encoding))
-                        {
-                            string responseText = reader.ReadToEnd();
+                StreamWriter requestWriter = new StreamWriter(s.Result);
+                requestWriter.Write(postString);
+                requestWriter.Close();
 
-                            JObject json = JObject.Parse(responseText);
-                            userName = (string)json.GetValue("username");
-                            
+                try
+                {
+                    using (WebResponse response = webRequest.GetResponse())
+                    {
+                        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://195.208.237.193:3000/auth/userInfo");//"http://192.168.0.125:3000/auth/userInfo"); // и тут тоже
+                        request.CookieContainer = cookies;
+                        HttpWebResponse responseUserInfo = (HttpWebResponse)request.GetResponse();
+                        if (responseUserInfo.StatusCode == HttpStatusCode.Forbidden)
+                        {
+                            Logger.Log("Невозможно получить данные пользователя", this);
                         }
-                        responseUserInfo.Close();
-                        Logger.Log("Вы вошли как: " + userName, this);
-                        onAuthorised();
-                        return;
+                        else if (responseUserInfo.StatusCode == HttpStatusCode.OK)
+                        {
+                            var encoding = Encoding.UTF8;
+                            using (var reader = new System.IO.StreamReader(responseUserInfo.GetResponseStream(), encoding))
+                            {
+                                string responseText = reader.ReadToEnd();
+
+                                JObject json = JObject.Parse(responseText);
+                                userName = (string)json.GetValue("username");
+
+                            }
+                            responseUserInfo.Close();
+                            Logger.Log("Вы вошли как: " + userName, this);
+                            onAuthorised();
+                            return;
+                        }
                     }
+
                 }
-
-            }
-            catch (WebException exp)
-            {
-                /*using (WebResponse response = exp.Response)
+                catch (WebException exp)
                 {
-                    HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    if (httpResponse != null)
+                    /*using (WebResponse response = exp.Response)
                     {
-                        switch ((int)httpResponse.StatusCode)
+                        HttpWebResponse httpResponse = (HttpWebResponse)response;
+                        if (httpResponse != null)
                         {
-                            case 401:
-                                Logger.Log("Неверный логин или пароль", this);
-                                break;
+                            switch ((int)httpResponse.StatusCode)
+                            {
+                                case 401:
+                                    Logger.Log("Неверный логин или пароль", this);
+                                    break;
+                            }
                         }
-                    }
-                }*/
-                Logger.Log(exp.Message, this);
-            }
-            onAuthoriseFailed();
+                    }*/
+                    Logger.Log(exp.Message, this);
+                }
+                onAuthoriseFailed();
+            });
         }
     }
 

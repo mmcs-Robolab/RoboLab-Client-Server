@@ -15,13 +15,12 @@ namespace RoboClient
 {
     public partial class Form1 : Form
     {
-        RobolabConnection connection;
-        RobotDispatcher dispatcher;
+        
+        RobotClient client;
         public Form1()
         {
             InitializeComponent();
-            connection = new RobolabConnection();
-            dispatcher = new RobotDispatcher();
+            client = new RobotClient();
         }
 
         private void Connection_ConnectFailed(object sender, EventArgs e)
@@ -59,11 +58,6 @@ namespace RoboClient
             this.Invoke(() => serverPanel.Enabled = true);
         }
 
-        private void addRobot(String name, BaseRobot baseRobot)
-        {
-            
-        }
-
         private void Logger_LogUpdated(object sender, LogUpdateEventArgs e)
         {
             this.Invoke(()=>logText.AppendText(e.Message+Environment.NewLine));
@@ -81,7 +75,7 @@ namespace RoboClient
             nameText.Enabled = false;
             passText.Enabled = false;
             authBtn.Enabled = false;
-            connection.Authorise(nameText.Text, passText.Text);
+            client.Connection.Authorise(nameText.Text, passText.Text);
         }
 
         private void connectButton_Click(object sender, EventArgs e)
@@ -92,7 +86,7 @@ namespace RoboClient
                 serverPanel.Enabled = false;
                 //this.BeginInvoke(()=> connection.Connect(ipText.Text, port, pointNameText.Text));
                 //Task.Run(() => connection.Connect(ipText.Text, port, pointNameText.Text));
-                connection.Connect(ipText.Text, port, pointNameText.Text);
+                client.Connection.Connect(ipText.Text, port, pointNameText.Text);
             }
             else
                 Logger.Log("Порт должен быть числом.");
@@ -107,14 +101,14 @@ namespace RoboClient
         {
             Logger.LogUpdated += Logger_LogUpdated;
             Logger.Log("Starting", this);
-            
-            connection.Authorised += Connection_Authorised;
-            connection.Connected += Connection_Connected;
-            connection.DataReceived += Connection_DataReceived;
-            connection.Disconnected += Connection_Disconnected;
-            connection.AuthoriseFailed += Connection_AuthoriseFailed;
-            connection.ConnectFailed += Connection_ConnectFailed;
 
+            client.Connection.Authorised += Connection_Authorised;
+            client.Connection.Connected += Connection_Connected;
+            client.Connection.DataReceived += Connection_DataReceived;
+            client.Connection.Disconnected += Connection_Disconnected;
+            client.Connection.AuthoriseFailed += Connection_AuthoriseFailed;
+            client.Connection.ConnectFailed += Connection_ConnectFailed;
+            
             /*dispatcher.AddBaseRobot("test", new DummyRobot());
 
             string s = File.ReadAllText("../../../RoboLabLib/TestRobot.cs");

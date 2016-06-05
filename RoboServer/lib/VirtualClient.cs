@@ -67,7 +67,7 @@ namespace RoboServer.lib
 
         public override void GetRobots(int UserID)
         {
-            onReceiveMessage(UserID, String.Join("#", dispatcher.GetRobots()));
+            onReceiveMessage(UserID, "robots#"+String.Join("#", dispatcher.GetRobots()));
         }
 
         public override void SendSource(int UserID, string Source, string MainClass)

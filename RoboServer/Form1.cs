@@ -77,7 +77,7 @@ namespace RoboServer
             this.Invoke(()=>
             {
                 appendSockLogBox(args.Connection.selfID + " connected");
-                robotClients[args.Connection.selfID] = new RobotClientProxy();
+                robotClients[args.Connection.selfID] = new RobotClientProxy(args.Connection);
             });
         }
 
@@ -140,7 +140,7 @@ namespace RoboServer
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
                         webSocketServer.MessageUser(userID, "messageRobot#Failure");
                     else
-                        robotClients[userBindings[userID]].CommandRobot(userID, messageParts[1]);
+                        robotClients[userBindings[userID]].CommandRobot(userID, String.Join("#", messageParts.Skip(1)));
                     break;
                 case "compileRobot":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 3)

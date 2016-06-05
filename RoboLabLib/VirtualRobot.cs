@@ -9,8 +9,9 @@ namespace RoboLab
 {
     public class VirtualRobot : BaseRobot
     {
-        public Vector3 velocity;
+        public double velocity;
         public Vector3 position;
+        public double lateralVelocity;
         public Vector3 direction;
         public Vector3 up;
 
@@ -21,11 +22,10 @@ namespace RoboLab
         public Rect boundRect;
 
         private double speedCoef = 0.1;
-
-
+        
         public VirtualRobot()
         {
-            velocity = new Vector3(0, 0, 0);
+            velocity = 0;
             position = new Vector3(0, 0, 0);
             direction = new Vector3(0, 0, -1);
             up = new Vector3(0, 1, 0);
@@ -43,7 +43,7 @@ namespace RoboLab
                                  new Vector3(position.x - width/2, position.y, position.z - depth/2),
                                  new Vector3(position.x + width/2, position.y, position.z + depth/2));
         }
-
+        /*
         public override void BeginMoveForward(double paramVelocity)
         {
             this.velocity = direction;
@@ -74,7 +74,7 @@ namespace RoboLab
         {
             velocity = new Vector3();
         }
-
+        */
         public void updateSize(double width, double height, double depth)
         {
             this.width = width;
@@ -82,15 +82,56 @@ namespace RoboLab
             this.depth = depth;
         }
         
+    }
 
-        public override void BeginGetSensorValue(SensorType type)
+    public class VirtualForwardMotor : Motor
+    {
+        VirtualRobot robot;
+
+        public VirtualForwardMotor(VirtualRobot robot)
         {
-            throw new NotImplementedException();
+            this.robot = robot;
+            this.MotorType = LogicalMotorType.Forward;
         }
 
-        public override double[] GetSensorValue(SensorType type)
+        public override void Brake()
         {
-            throw new NotImplementedException();
+            robot.velocity = 0;
+        }
+
+        public override PollResult Poll()
+        {
+            return new MotorPollResult(0);
+        }
+
+        public override void Run(double power)
+        {
+            robot.velocity = power;
+        }
+    }
+
+    public class VirtualLateralMotor : Motor
+    {
+        VirtualRobot robot;
+
+        public VirtualLateralMotor(VirtualRobot robot)
+        {
+            this.robot = robot;
+        }
+
+        public override void Brake()
+        {
+            robot.lateralVelocity = 0;
+        }
+
+        public override PollResult Poll()
+        {
+            return new MotorPollResult(0);
+        }
+
+        public override void Run(double power)
+        {
+            robot.lateralVelocity = power;
         }
     }
 }

@@ -3,152 +3,100 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace RoboLab
 {
     
     public abstract class BaseRobot : MarshalByRefObject
     {
-        public event SensorUpdateEventHandler SensorUpdate;
+        protected List<Motor> motors;
+        protected List<Sensor> sensors;
 
-        /// <summary>
-        /// Команда "идти вперед"
-        /// </summary>
-        /// <param name="speed">Скорость движения</param>
-        public abstract void BeginMoveForward(double speed);
-
-        /// <summary>
-        /// Команда "идти назад"
-        /// </summary>
-        /// <param name="speed">Скорость движения</param>
-        public abstract void BeginMoveBackward(double speed);
-
-        /// <summary>
-        /// Остановка всех текущих действий
-        /// </summary>
-        public abstract void Stop();
-
-        /// <summary>
-        /// Команда "повернуть налево"
-        /// </summary>
-        /// <param name="speed">Скорость поворота</param>
-        public abstract void BeginTurnLeft(double speed);
-
-        /// <summary>
-        /// Команда "повернуть направо"
-        /// </summary>
-        /// <param name="speed">Скорость поворота</param>
-        public abstract void BeginTurnRight(double speed);
-
-        /// <summary>
-        /// Получить список установленных на роботе сенсоров
-        /// </summary>
-        /// <returns></returns>
-        public virtual SensorType[] GetSupportedSensors()
+        public BaseRobot()
         {
-            return new SensorType[] { };
+            motors = new List<Motor>();
+            sensors = new List<Sensor>();
         }
 
-        public abstract void BeginGetSensorValue(SensorType type);
-
-        public abstract double[] GetSensorValue(SensorType type);
-
-        /// <summary>
-        /// Специальное действие
-        /// </summary>
-        /// <param name="action">Название действия</param>
-        /// <param name="param">Параметры к вызову действия (если необходимо)</param>
-        public virtual void SpecialAction(string action, object param = null)
+        public IList<Motor> GetMotors()
         {
-
-        }
-        /// <summary>
-        /// Получить описание поддерживаемых специальных действий
-        /// </summary>
-        /// <returns>Массив поддерживаемых специальных действий</returns>
-        public virtual string[] GetSpecialActions()
-        {
-            return new string[] { };
+            return motors.AsReadOnly();
         }
 
-        /// <summary>
-        /// Метод вызова события получения данных с сенсоров
-        /// </summary>
-        protected void onSensorUpdate(SensorUpdateEventArgs e)
+        public IList<Sensor> GetSensors()
         {
-            if (this.SensorUpdate != null)
-                this.SensorUpdate(this, e);
+            return sensors.AsReadOnly();
         }
     }
 
-    //TODO: Добавить еще видов сенсоров
-    public enum SensorType { LaserScanner, Odometry }
-    [Serializable]
-    public class SensorUpdateEventArgs : EventArgs
-    {
-        public SensorType Type { get; set; }
-        public double[] Data { get; set; }
-        public SensorUpdateEventArgs(SensorType type, double[] data)
-        {
-            Type = type;
-            Data = data;
-        }
-    }
+    public abstract class PollResult : MarshalByRefObject
+    {}
 
-    public delegate void SensorUpdateEventHandler(object sender, SensorUpdateEventArgs args);
-    [Serializable]
-    public abstract class Action
+    public delegate void PollDelegate(Pollable sender, PollResult e);
+
+    public abstract class Pollable : MarshalByRefObject
     {
-        public string Name { get; protected set; }
+        public event PollDelegate Polled;
+
+        private Timer pollTimer;
         
-    }
-    public enum MovementType { Forward, Backward, TurnLeft, TurnRight }
-    [Serializable]
-    public class MovementAction : Action
-    {
-        public MovementType Type { get; private set; }
-        public double Amount { get; private set; }
-        public MovementAction(MovementType type, double amount)
+        public double PollInterval
         {
-            switch (type)
+            get
             {
-                case MovementType.Forward:
-                    Name = "MoveForward";
-                    break;
-                case MovementType.Backward:
-                    Name = "MoveBackward";
-                    break;
-                case MovementType.TurnLeft:
-                    Name = "TurnLeft";
-                    break;
-                case MovementType.TurnRight:
-                    Name = "TurnRight";
-                    break;
+                return pollTimer.Interval;
             }
-            Amount = amount;
+            set
+            {
+                pollTimer.Interval = value;
+                if (value > 0)
+                    pollTimer.Start();
+                else
+                    pollTimer.Stop();
+            }
+        }
+
+        public abstract PollResult Poll();
+
+        public Pollable()
+        {
+            pollTimer = new Timer(0);
+            pollTimer.AutoReset = true;
+            pollTimer.Elapsed += PollTimer_Elapsed;
+        }
+
+        private void PollTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Poll();
         }
     }
-    [Serializable]
-    public class SpecialAction : Action
+    [Flags]
+    public enum LogicalMotorType { Nothing = 0, Forward = 1, Backward = 2, RightTurn = 4, LeftTurn = 8, Steer = 16 };
+
+    public abstract class Motor : Pollable
     {
-        public object Param { get; private set; }
-        public SpecialAction(string action, object param = null)
-        {
-            Name = action;
-            Param = param;
-        }
+        public LogicalMotorType MotorType { get; protected set; } = LogicalMotorType.Nothing;
+
+        public abstract void Run(double power);
+
+        public abstract void Brake();
     }
-    [Serializable]
-    public class ActionCompletedEventArgs : EventArgs
+
+    public class MotorPollResult : PollResult
     {
-        public Action Action { get; set; }
-        public ActionCompletedEventArgs(Action action = null)
+        public double TachoCount { get; private set; }
+
+        public MotorPollResult(double tachoCount)
         {
-            Action = action;
+            TachoCount = tachoCount;
         }
     }
 
-    public delegate void ActionCompletedEventHandler(object sender, ActionCompletedEventArgs args);
+    public enum SensorType { Laser }
 
-    
+    public abstract class Sensor : Pollable
+    {
+        public SensorType SensorType { get; protected set; }
+    }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoboLab
 {
+    /*
     //TODO
     public class AdvancedRobot : Robot
     {
@@ -85,4 +86,5 @@ namespace RoboLab
             return actions.Count == 0;
         }
     }
+    */
 }
