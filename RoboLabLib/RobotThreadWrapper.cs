@@ -45,7 +45,7 @@ namespace RoboLab
             dynamic classRef;
             try
             {
-                classRef = DynamicCompiler.Compile(source, mainClass, new Object[] { });
+                classRef = DynamicCompiler.Compile(source, mainClass, new object[] { });
                 if (classRef is CompilerErrorCollection)
                 {
                     StringBuilder sberror = new StringBuilder();

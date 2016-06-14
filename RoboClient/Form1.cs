@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using RoboLab;
 using System.Reflection;
 using System.IO;
+using System.Threading;
 
 namespace RoboClient
 {
@@ -120,12 +121,55 @@ namespace RoboClient
            
             t.Start();*/
         }
-        /*
-        private void T_Tick(object sender, EventArgs e)
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Logger.Log("Stop");
-            dispatcher.StopRobot("test");
-            ((Timer)sender).Stop();
-        }*/
+
+        }
+
+        private void addRobotButton_Click(object sender, EventArgs e)
+        {
+            if (robotNameTextBox.Text == "")
+                MessageBox.Show("Введите имя робота!");
+            else if (robotPortTextBox.Text == "")
+                MessageBox.Show("Укажите порт!");
+            else if (client.GetRobots().Contains(robotNameTextBox.Text))
+                MessageBox.Show("Робот с таким именем уже добавлен!");
+            else if ((string)robotTypeComboBox.SelectedItem == "")
+                MessageBox.Show("Выберите тип робота!");
+            else
+            { 
+                BaseRobot robot = null;
+                switch ((string)robotTypeComboBox.SelectedItem)
+                {
+                    case "Lego":
+                        LegoRobot legoRobot = new LegoRobot(robotPortTextBox.Text);
+                        legoRobot.AddMotorPair(LegoRobot.MotorPort.PortA, LegoRobot.MotorPort.PortB);
+                        if(!legoRobot.Connect())
+                        {
+                            MessageBox.Show("Не удалось подключиться к роботу!");
+                            return;
+                        }
+                        robot = legoRobot;
+                        break;
+                    case "Car":
+                        robot = new CarRobot(robotPortTextBox.Text);
+                        Thread.Sleep(500);
+                        if(!((CarRobot)robot).IsConnected)
+                        {
+                            MessageBox.Show("Не удалось подключиться к роботу!");
+                            return;
+                        }
+                        break;
+                }
+                if (robot != null)
+                {
+                    client.addRobot(robotNameTextBox.Text, robot);
+                    robotsListBox.Items.Add(robotNameTextBox.Text);
+                }
+            }
+
+        }
+        
     }
 }

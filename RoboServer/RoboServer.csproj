@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="lib\ClientDispatcher.cs" />
     <Compile Include="lib\ConnectionEvent.cs" />
     <Compile Include="lib\Device.cs" />
     <Compile Include="Form1.cs">
@@ -75,7 +76,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="lib\RobotClient.cs" />
+    <Compile Include="lib\IRobotClient.cs" />
     <Compile Include="lib\RobotClientProxy.cs" />
     <Compile Include="lib\VirtualClient.cs" />
     <Compile Include="Program.cs" />

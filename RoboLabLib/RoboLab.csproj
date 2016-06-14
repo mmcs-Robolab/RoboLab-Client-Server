@@ -34,6 +34,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="NKH.MindSqualls">
+      <HintPath>Mindsqualls\NKH.MindSqualls.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Extensions" />
@@ -43,15 +46,22 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WinUsbWrapper">
+      <HintPath>Mindsqualls\WinUsbWrapper.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvancedRobot.cs" />
+    <Compile Include="CarRobot.cs" />
+    <Compile Include="LegoRobot.cs" />
+    <Compile Include="SequentialMovesRobot.cs" />
     <Compile Include="BaseRobot.cs" />
+    <Compile Include="DataAccumulator.cs" />
     <Compile Include="DummyRobot.cs" />
     <Compile Include="DynamicCompiler.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MathLib\Rect.cs" />
     <Compile Include="MathLib\Vector3.cs" />
+    <Compile Include="MovingRobot.cs" />
     <Compile Include="Objects\Barrier.cs" />
     <Compile Include="Objects\Plane.cs" />
     <Compile Include="Objects\SceneObject.cs" />
@@ -64,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mindsqualls\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

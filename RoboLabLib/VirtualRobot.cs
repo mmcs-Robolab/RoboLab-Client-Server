@@ -43,38 +43,6 @@ namespace RoboLab
                                  new Vector3(position.x - width/2, position.y, position.z - depth/2),
                                  new Vector3(position.x + width/2, position.y, position.z + depth/2));
         }
-        /*
-        public override void BeginMoveForward(double paramVelocity)
-        {
-            this.velocity = direction;
-            this.velocity.multiplyScalar(paramVelocity * speedCoef);
-        }
-
-        public override void BeginMoveBackward(double paramVelocity)
-        {
-            this.velocity = direction;
-            this.velocity.multiplyScalar(-paramVelocity * speedCoef);
-        }
-
-        
-
-        public override void BeginTurnLeft(double angle)
-        {
-            direction.rotateOnY(angle);
-            boundRect.rotate(angle);
-        }
-
-        public override void BeginTurnRight(double angle)
-        {
-            direction.rotateOnY(-angle);
-            boundRect.rotate(angle);
-        }
-        
-        public override void Stop()
-        {
-            velocity = new Vector3();
-        }
-        */
         public void updateSize(double width, double height, double depth)
         {
             this.width = width;
@@ -83,14 +51,36 @@ namespace RoboLab
         }
         
     }
-
-    public class VirtualForwardMotor : Motor
+    public abstract class VirtualMotor : BasePollable, IMotor
     {
-        VirtualRobot robot;
-
-        public VirtualForwardMotor(VirtualRobot robot)
+        protected VirtualRobot robot;
+        protected double tacho = 0;
+        public VirtualMotor(VirtualRobot robot)
         {
             this.robot = robot;
+        }
+
+        public LogicalMotorType MotorType { get; protected set; } = LogicalMotorType.Nothing;
+
+        public abstract void Brake();
+
+        public override PollResult Poll()
+        {
+            MotorPollResult res = new MotorPollResult(tacho);
+            tacho = 0;
+            onPolled(res);
+            return res;
+        }
+
+        public abstract void Run(double power);
+
+        internal abstract void SimulationTick();
+
+    }
+    public class VirtualForwardMotor : VirtualMotor
+    {
+        public VirtualForwardMotor(VirtualRobot robot):base(robot)
+        {
             this.MotorType = LogicalMotorType.Forward;
         }
 
@@ -98,25 +88,23 @@ namespace RoboLab
         {
             robot.velocity = 0;
         }
-
-        public override PollResult Poll()
-        {
-            return new MotorPollResult(0);
-        }
-
+        
         public override void Run(double power)
         {
             robot.velocity = power;
         }
+
+        internal override void SimulationTick()
+        {
+            tacho += Math.Abs(robot.velocity);
+        }
     }
 
-    public class VirtualLateralMotor : Motor
+    public class VirtualLateralMotor : VirtualMotor
     {
-        VirtualRobot robot;
-
-        public VirtualLateralMotor(VirtualRobot robot)
+        public VirtualLateralMotor(VirtualRobot robot) : base(robot)
         {
-            this.robot = robot;
+            this.MotorType = LogicalMotorType.Right;
         }
 
         public override void Brake()
@@ -126,12 +114,20 @@ namespace RoboLab
 
         public override PollResult Poll()
         {
-            return new MotorPollResult(0);
+            MotorPollResult res = new MotorPollResult(tacho);
+            tacho = 0;
+            onPolled(res);
+            return res;
         }
 
         public override void Run(double power)
         {
             robot.lateralVelocity = power;
+        }
+
+        internal override void SimulationTick()
+        {
+            tacho += Math.Abs(robot.lateralVelocity);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace RoboServer
         WebSockServer webSocketServer;
         Dictionary<int, int> userBindings;
 
-        Dictionary<int, RobotClient> robotClients;
+        Dictionary<int, IRobotClient> robotClients;
 
         public MainForm()
         {
@@ -38,7 +38,7 @@ namespace RoboServer
         private void createSockServerBtn_Click(object sender, EventArgs e)
         {
             userBindings = new Dictionary<int, int>();
-            robotClients = new Dictionary<int, RobotClient>();
+            robotClients = new Dictionary<int, IRobotClient>();
 
             webSocketServer = new WebSockServer(ip, getWebSocketPort());
             webSocketServer.Start();

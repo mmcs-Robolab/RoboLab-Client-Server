@@ -32,7 +32,7 @@ namespace RoboLab
 
         }
 
-        internal void SetBaseRobot(BaseRobot baseRobot)
+        internal virtual void SetBaseRobot(BaseRobot baseRobot)
         {
             this.baseRobot = baseRobot;
         }
@@ -42,9 +42,19 @@ namespace RoboLab
             return baseRobot;
         }
 
+        public IList<IMotor> GetMotors()
+        {
+            return baseRobot.GetMotors();
+        }
+
+        public IList<ISensor> GetSensors()
+        {
+            return baseRobot.GetSensors();
+        }
+
         public Robot(BaseRobot baseRobot)
         {
-            this.baseRobot = baseRobot;
+            SetBaseRobot(baseRobot);
         }
 
         public void Receive(string msg)
@@ -78,7 +88,7 @@ namespace RoboLab
             Task.Factory.StartNew(Run).ContinueWith(t => onCrashed(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        public void Sleep(double time = 0)
+        public void Sleep(double time = 1)
         {
             if (FellAsleep != null)
                 FellAsleep(this, new SleepEventArgs(time));

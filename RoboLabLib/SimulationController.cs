@@ -71,6 +71,12 @@ namespace RoboLab
         public void updatePosition()
         {
             //robot.position.add(robot.velocity);
+            foreach(IMotor m in robot.GetMotors())
+            {
+                VirtualMotor vm = m as VirtualMotor;
+                if (vm != null)
+                    vm.SimulationTick();
+            }
             robot.direction.rotateOnY(robot.lateralVelocity);
             Vector3 v = robot.direction.Clone();
             v.multiplyScalar(robot.velocity);

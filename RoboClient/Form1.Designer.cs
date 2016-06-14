@@ -44,7 +44,17 @@
             this.msgField = new System.Windows.Forms.TextBox();
             this.logText = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.robotsListBox = new System.Windows.Forms.ListBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.robotNameTextBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.robotPortTextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.robotTypeComboBox = new System.Windows.Forms.ComboBox();
+            this.addRobotButton = new System.Windows.Forms.Button();
             this.serverPanel.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // authBtn
@@ -202,11 +212,104 @@
             this.button2.Text = "Отправить";
             this.button2.UseVisualStyleBackColor = true;
             // 
+            // robotsListBox
+            // 
+            this.robotsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.robotsListBox.FormattingEnabled = true;
+            this.robotsListBox.Location = new System.Drawing.Point(425, 311);
+            this.robotsListBox.Name = "robotsListBox";
+            this.robotsListBox.Size = new System.Drawing.Size(209, 121);
+            this.robotsListBox.TabIndex = 19;
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.addRobotButton);
+            this.panel1.Controls.Add(this.robotTypeComboBox);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Controls.Add(this.robotPortTextBox);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.robotNameTextBox);
+            this.panel1.Location = new System.Drawing.Point(425, 190);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(208, 117);
+            this.panel1.TabIndex = 20;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(70, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Имя робота:";
+            // 
+            // robotNameTextBox
+            // 
+            this.robotNameTextBox.Location = new System.Drawing.Point(106, 6);
+            this.robotNameTextBox.Name = "robotNameTextBox";
+            this.robotNameTextBox.Size = new System.Drawing.Size(92, 20);
+            this.robotNameTextBox.TabIndex = 3;
+            this.robotNameTextBox.Text = "NewRobot";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(9, 35);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "Порт:";
+            // 
+            // robotPortTextBox
+            // 
+            this.robotPortTextBox.Location = new System.Drawing.Point(106, 32);
+            this.robotPortTextBox.Name = "robotPortTextBox";
+            this.robotPortTextBox.Size = new System.Drawing.Size(92, 20);
+            this.robotPortTextBox.TabIndex = 6;
+            this.robotPortTextBox.Text = "COM1";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 60);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(67, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Тип робота:";
+            // 
+            // robotTypeComboBox
+            // 
+            this.robotTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.robotTypeComboBox.FormattingEnabled = true;
+            this.robotTypeComboBox.Items.AddRange(new object[] {
+            "Lego",
+            "Car"});
+            this.robotTypeComboBox.Location = new System.Drawing.Point(106, 57);
+            this.robotTypeComboBox.Name = "robotTypeComboBox";
+            this.robotTypeComboBox.Size = new System.Drawing.Size(91, 21);
+            this.robotTypeComboBox.TabIndex = 8;
+            this.robotTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // addRobotButton
+            // 
+            this.addRobotButton.Location = new System.Drawing.Point(12, 84);
+            this.addRobotButton.Name = "addRobotButton";
+            this.addRobotButton.Size = new System.Drawing.Size(191, 27);
+            this.addRobotButton.TabIndex = 9;
+            this.addRobotButton.Text = "Добавить";
+            this.addRobotButton.UseVisualStyleBackColor = true;
+            this.addRobotButton.Click += new System.EventHandler(this.addRobotButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(646, 472);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.robotsListBox);
             this.Controls.Add(this.authBtn);
             this.Controls.Add(this.passText);
             this.Controls.Add(this.passLabel);
@@ -222,6 +325,8 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.serverPanel.ResumeLayout(false);
             this.serverPanel.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -245,6 +350,15 @@
         private System.Windows.Forms.TextBox msgField;
         private System.Windows.Forms.TextBox logText;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ListBox robotsListBox;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.ComboBox robotTypeComboBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox robotPortTextBox;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox robotNameTextBox;
+        private System.Windows.Forms.Button addRobotButton;
     }
 }
 

@@ -10,21 +10,21 @@ namespace RoboLab
     
     public abstract class BaseRobot : MarshalByRefObject
     {
-        protected List<Motor> motors;
-        protected List<Sensor> sensors;
+        protected List<IMotor> motors;
+        protected List<ISensor> sensors;
 
         public BaseRobot()
         {
-            motors = new List<Motor>();
-            sensors = new List<Sensor>();
+            motors = new List<IMotor>();
+            sensors = new List<ISensor>();
         }
 
-        public IList<Motor> GetMotors()
+        public IList<IMotor> GetMotors()
         {
             return motors.AsReadOnly();
         }
 
-        public IList<Sensor> GetSensors()
+        public IList<ISensor> GetSensors()
         {
             return sensors.AsReadOnly();
         }
@@ -33,9 +33,23 @@ namespace RoboLab
     public abstract class PollResult : MarshalByRefObject
     {}
 
-    public delegate void PollDelegate(Pollable sender, PollResult e);
+    public class EmptyPollResult : PollResult
+    { }
 
-    public abstract class Pollable : MarshalByRefObject
+    public delegate void PollDelegate(IPollable sender, PollResult e);
+
+    public interface IPollable
+    {
+        event PollDelegate Polled;
+        
+        double PollInterval {
+            get; set;
+        } 
+
+        PollResult Poll();
+    }
+
+    public abstract class BasePollable : MarshalByRefObject, IPollable
     {
         public event PollDelegate Polled;
 
@@ -59,11 +73,17 @@ namespace RoboLab
 
         public abstract PollResult Poll();
 
-        public Pollable()
+        public BasePollable()
         {
             pollTimer = new Timer(0);
             pollTimer.AutoReset = true;
             pollTimer.Elapsed += PollTimer_Elapsed;
+        }
+
+        protected void onPolled(PollResult pr)
+        {
+            if (Polled != null)
+                Polled(this, pr);
         }
 
         private void PollTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -72,15 +92,15 @@ namespace RoboLab
         }
     }
     [Flags]
-    public enum LogicalMotorType { Nothing = 0, Forward = 1, Backward = 2, RightTurn = 4, LeftTurn = 8, Steer = 16 };
+    public enum LogicalMotorType { Nothing = 0, Forward = 1, Backward = 2, Right = 4, Left = 8, Steer = 16 };
 
-    public abstract class Motor : Pollable
+    public interface IMotor
     {
-        public LogicalMotorType MotorType { get; protected set; } = LogicalMotorType.Nothing;
+        LogicalMotorType MotorType { get; }
+        
+        void Run(double power);
 
-        public abstract void Run(double power);
-
-        public abstract void Brake();
+        void Brake();
     }
 
     public class MotorPollResult : PollResult
@@ -93,10 +113,10 @@ namespace RoboLab
         }
     }
 
-    public enum SensorType { Laser }
+    public enum SensorType { Laser, Touch }
 
-    public abstract class Sensor : Pollable
+    public interface ISensor : IPollable
     {
-        public SensorType SensorType { get; protected set; }
+        SensorType SensorType { get; }
     }
 }

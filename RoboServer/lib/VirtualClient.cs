@@ -8,14 +8,20 @@ using RoboLab;
 
 namespace RoboServer.lib
 {
-    class VirtualClient : RobotClient
+    class VirtualClient : IRobotClient
     {
-        public override event ReceiveMessagehandler ReceiveMessage;
+        public event ReceiveMessagehandler ReceiveMessage;
 
         RobotDispatcher dispatcher;
         SimulationController simulation;
 
         Timer updateTimer;
+
+        public SortedSet<int> Users
+        {
+            get;
+            set;
+        }
 
         private void onReceiveMessage(int UserID, string message)
         {
@@ -25,6 +31,7 @@ namespace RoboServer.lib
 
         public VirtualClient()
         {
+            Users = new SortedSet<int>();
             dispatcher = new RobotDispatcher();
             simulation = new SimulationController();
             dispatcher.AddBaseRobot("simulated", simulation.getRobot());
@@ -52,7 +59,7 @@ namespace RoboServer.lib
             onReceiveMessage(args.UserID, "messageFromRobot#"+args.Message);
         }
 
-        public override void BindUserRobot(int UserID, string Robot)
+        public void BindUserRobot(int UserID, string Robot)
         {
             if (dispatcher.BindUser(UserID, Robot))
                 onReceiveMessage(UserID, "bindingResult#Success");
@@ -60,17 +67,17 @@ namespace RoboServer.lib
                 onReceiveMessage(UserID, "bindingResult#Failure");
         }
 
-        public override void CommandRobot(int UserID, string Command)
+        public void CommandRobot(int UserID, string Command)
         {
             dispatcher.GetUserRobot(UserID).Receive(Command);
         }
 
-        public override void GetRobots(int UserID)
+        public void GetRobots(int UserID)
         {
             onReceiveMessage(UserID, "robots#"+String.Join("#", dispatcher.GetRobots()));
         }
 
-        public override void SendSource(int UserID, string Source, string MainClass)
+        public void SendSource(int UserID, string Source, string MainClass)
         {
             string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(UserID), Source, MainClass);
             onReceiveMessage(UserID, "compilationResult#"+result);
