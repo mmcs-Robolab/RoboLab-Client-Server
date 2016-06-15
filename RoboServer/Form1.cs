@@ -101,7 +101,7 @@ namespace RoboServer
             switch (messageParts[0])
             {
                 case "listServers":
-                    webSocketServer.MessageUser(userID, String.Join("#", getServerList()));
+                    webSocketServer.MessageUser(userID, "servers#" + String.Join("#", getServerList()));
                     break;
                 case "chooseServer":
                     int server;

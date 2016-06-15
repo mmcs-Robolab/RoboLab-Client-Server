@@ -93,6 +93,7 @@ namespace RoboServer.lib
         public void StopSimulation()
         {
             simulation.StopSimulation();
+            updateTimer.Stop();
             foreach (string robot in dispatcher.GetRobots().ToArray())
                 dispatcher.StopRobot(robot);
         }

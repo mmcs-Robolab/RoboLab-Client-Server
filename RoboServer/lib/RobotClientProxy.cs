@@ -41,14 +41,20 @@ namespace RoboServer.lib
 
         private void receiveCallback(IAsyncResult ar)
         {
-            
-            int bytesRead = connection.clientSock.EndReceive(ar);
-            
-            if (bytesRead > 0)
+            try
             {
-                string fullMessage = Encoding.UTF8.GetString(recvBuffer, 0, bytesRead);
-                dataAccumulator.AcceptData(fullMessage);
-                connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
+                int bytesRead = connection.clientSock.EndReceive(ar);
+
+                if (bytesRead > 0)
+                {
+                    string fullMessage = Encoding.UTF8.GetString(recvBuffer, 0, bytesRead);
+                    dataAccumulator.AcceptData(fullMessage);
+                    connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
+                }
+            }
+            catch(Exception e)
+            {
+                RoboLab.Logger.Log(e.Message, this);
             }
         }
 
