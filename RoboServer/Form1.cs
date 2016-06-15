@@ -55,6 +55,11 @@ namespace RoboServer
             socketServer.Disconnected += SocketServer_Disconnected;
             socketServer.MessageReceived += SocketServer_MessageReceived;
             socketServer.MessageSent += SocketServer_MessageSent;
+
+            /*RoboLab.VirtualRobot vr = new RoboLab.VirtualRobot();
+            RoboLab.MovingRobot mr = new RoboLab.SequentialMovesRobot();
+            mr.SetBaseRobot(vr);
+            mr.BeginMoveForward(1);*/
         }
 
         private void SocketServer_MessageSent(object sender, ConnectionEventArgs args)
@@ -115,14 +120,15 @@ namespace RoboServer
                     break;
                 case "createSimulation":
                     int id = socketServer.getNextId();
-                    robotClients[id] = new VirtualClient();
-                    robotClients[id].ReceiveMessage += MainForm_ReceiveMessage;
+                    VirtualClient vc = new VirtualClient();
+                    robotClients[id] = vc;
+                    vc.ReceiveMessage += MainForm_ReceiveMessage;
                     userBindings[userID] = id;
                     webSocketServer.MessageUser(userID, "creationResult#..."); //
-                    robotClients[id].BindUserRobot(userID, "simulated");
-                    robotClients[id].Users.Add(userID);
-                    ((VirtualClient)robotClients[id]).ImportScene(String.Concat(messageParts.Skip(1)));
-                    ((VirtualClient)robotClients[id]).StartSimulation();
+                    vc.BindUserRobot(userID, "simulated");
+                    vc.Users.Add(userID);
+                    vc.ImportScene(String.Concat(messageParts.Skip(1)));
+                    vc.StartSimulation();
                     break;
                 case "listRobots":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))

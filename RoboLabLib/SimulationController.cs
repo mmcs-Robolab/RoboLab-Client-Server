@@ -37,6 +37,7 @@ namespace RoboLab
         public SimulationController()
         {
             robot = new VirtualRobot();
+            barrierList = new List<Barrier>();
         }
 
         public void setRobot(VirtualRobot robot)
@@ -97,7 +98,7 @@ namespace RoboLab
 
         public void saveCurPosition()
         {
-            if (robot.direction.isDifferentDirection(oldDirection))
+            if (robot.position.isDifferentDirection(oldDirection))
             {
                 string moveType;
 
@@ -116,7 +117,7 @@ namespace RoboLab
 
                 pointList.Add(point);
 
-                oldDirection = robot.direction;
+                oldDirection = robot.position;
             }
 
 

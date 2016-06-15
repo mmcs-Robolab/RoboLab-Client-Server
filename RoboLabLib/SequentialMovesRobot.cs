@@ -25,6 +25,8 @@ namespace RoboLab
         {
             actionQueue.Enqueue(action);
             action.ActionCompleted += Action_ActionCompleted;
+            if(actionQueue.Count == 1)
+                action.StartAction(this);
         }
         
         private void Action_ActionCompleted(object sender, ActionCompletedEventArgs e)
@@ -41,38 +43,48 @@ namespace RoboLab
 
         public override void BeginMoveForward(double power, double turnRatio = 0)
         {
-            StartAction(new MoveAction(0, power, turnRatio));
+            StopCurrentAction();
+            actionQueue.Clear();
+            base.BeginMoveForward(power, turnRatio);
         }
 
         public override void BeginMoveBackward(double power, double turnRatio = 0)
         {
-            StartAction(new MoveAction(0, -power, turnRatio));
+            StopCurrentAction();
+            actionQueue.Clear();
+            base.BeginMoveBackward(power, turnRatio);
         }
 
         public override void BeginTurnRight(double power)
         {
-            StartAction(new MoveAction(0, power, 1));
+            StopCurrentAction();
+            actionQueue.Clear();
+            base.BeginTurnRight(power);
         }
 
         public override void BeginTurnLeft(double power)
         {
-            StartAction(new MoveAction(0, power, -1));
+            StopCurrentAction();
+            actionQueue.Clear();
+            base.BeginTurnLeft(power);
         }
-        public void BeginMoveForward(double tachoLimit, double power, double turnRatio = 0)
+        
+
+        public void EnqueueMoveForward(double tachoLimit, double power, double turnRatio = 0)
         {
             StartAction(new MoveAction(tachoLimit, power, turnRatio));
         }
-        public void BeginMoveBackward(double tachoLimit, double power, double turnRatio = 0)
+        public void EnqueueMoveBackward(double tachoLimit, double power, double turnRatio = 0)
         {
             StartAction(new MoveAction(tachoLimit, -power, turnRatio));
         }
 
-        public void BeginTurnRight(double tachoLimit, double power)
+        public void EnqueueTurnRight(double tachoLimit, double power)
         {
             StartAction(new MoveAction(tachoLimit, power, 1));
         }
 
-        public void BeginTurnLeft(double tachoLimit, double power)
+        public void EnqueueTurnLeft(double tachoLimit, double power)
         {
             StartAction(new MoveAction(tachoLimit, power, -1));
         }

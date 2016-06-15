@@ -54,18 +54,21 @@ namespace RoboLab
         public event PollDelegate Polled;
 
         private Timer pollTimer;
-        
+        double pollInterval;
         public double PollInterval
         {
             get
             {
-                return pollTimer.Interval;
+                return pollInterval;
             }
             set
             {
-                pollTimer.Interval = value;
+                pollInterval = value;
                 if (value > 0)
+                {
+                    pollTimer.Interval = value;
                     pollTimer.Start();
+                }
                 else
                     pollTimer.Stop();
             }
@@ -75,7 +78,8 @@ namespace RoboLab
 
         public BasePollable()
         {
-            pollTimer = new Timer(0);
+            pollInterval = 0;
+            pollTimer = new Timer(1);
             pollTimer.AutoReset = true;
             pollTimer.Elapsed += PollTimer_Elapsed;
         }

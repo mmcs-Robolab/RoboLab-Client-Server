@@ -35,6 +35,9 @@ namespace RoboLab
             depth = 0;
 
             boundRect = new Rect();
+            motors.Add(new VirtualForwardMotor(this));
+            motors.Add(new VirtualLateralMotor(this));
+            
         }
 
         public void createRectBound()
