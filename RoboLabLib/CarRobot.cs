@@ -9,11 +9,13 @@ namespace RoboLab
 {
     public class CarRobot : BaseRobot
     {
-        public SerialPort port { get; private set; } = new SerialPort();
-        public bool IsConnected { get; private set; } = false;
+        public SerialPort port { get; private set; }
+        public bool IsConnected { get; private set; }
 
         public CarRobot()
         {
+            port = new SerialPort();
+            IsConnected = false;
             port.DataReceived += Port_DataReceived;
         }
 

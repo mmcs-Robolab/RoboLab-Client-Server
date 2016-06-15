@@ -57,10 +57,11 @@ namespace RoboLab
         protected double tacho = 0;
         public VirtualMotor(VirtualRobot robot)
         {
+            MotorType = LogicalMotorType.Nothing;
             this.robot = robot;
         }
 
-        public LogicalMotorType MotorType { get; protected set; } = LogicalMotorType.Nothing;
+        public LogicalMotorType MotorType { get; protected set; }
 
         public abstract void Brake();
 

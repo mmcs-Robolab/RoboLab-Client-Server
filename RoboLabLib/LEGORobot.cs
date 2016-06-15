@@ -70,11 +70,11 @@ namespace RoboLab
         public double TurnRatio
         {
             get; private set;
-        } = 0;
+        }
         public double Power
         {
             get; private set;
-        } = 0;
+        }
         public NxtMotor MotorX
         {
             get; private set;
@@ -86,6 +86,8 @@ namespace RoboLab
 
         public MotorSync(NxtMotor motorX, NxtMotor motorY)
         {
+            TurnRatio = 0;
+            Power = 0;
             MotorX = motorX;
             MotorY = motorY;
             motorSync = new NxtMotorSync(motorX, motorY);

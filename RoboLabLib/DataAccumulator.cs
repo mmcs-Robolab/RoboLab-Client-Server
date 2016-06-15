@@ -9,7 +9,6 @@ namespace RoboLab
     
     public class DataAccumulator
     {
-        public int UserID;
 
         private string accum = "";
         private int numLeft = 0;
