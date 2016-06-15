@@ -10,7 +10,7 @@ namespace RoboLab
     
     public class SequentialMovesRobot : MovingRobot
     {
-        private Queue<MoveAction> actionQueue;
+        private Queue<MoveAction> actionQueue = new Queue<MoveAction>();
 
         public event ActionCompletedEventHandler ActionCompleted;
 
@@ -18,7 +18,7 @@ namespace RoboLab
 
         public SequentialMovesRobot()
         {
-            actionQueue = new Queue<MoveAction>();
+            
         }
 
         private void StartAction(MoveAction action)

@@ -11,13 +11,7 @@ namespace RoboLab
     {
         private BaseRobot baseRobot;
 
-        public event CrashedEventHandler Crashed;
-
-        private void onCrashed(Exception e)
-        {
-            if (Crashed != null)
-                Crashed(this, new CrashedEventArgs(e));
-        }
+        
         
         public event SleepEventHandler FellAsleep;
 
@@ -83,10 +77,6 @@ namespace RoboLab
             
         }
         
-        internal void RunAsync()
-        {
-            Task.Factory.StartNew(Run).ContinueWith(t => onCrashed(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
-        }
 
         public void Sleep(double time = 1)
         {

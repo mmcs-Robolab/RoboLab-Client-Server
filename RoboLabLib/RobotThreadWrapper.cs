@@ -78,7 +78,7 @@ namespace RoboLab
             get { return robot; }
             set
             {
-                this.robot = value;
+                robot = value;
                 robot.PrintMessage += Robot_PrintMessage;
                 robot.FellAsleep += Robot_FellAsleep;
                 robot.WokeUp += Robot_WokeUp;
