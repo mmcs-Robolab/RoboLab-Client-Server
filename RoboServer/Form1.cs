@@ -105,7 +105,7 @@ namespace RoboServer
                     break;
                 case "chooseServer":
                     int server;
-                    if (messageParts.Length < 2 || int.TryParse(messageParts[1], out server))
+                    if (messageParts.Length < 2 || !int.TryParse(messageParts[1], out server))
                         webSocketServer.MessageUser(userID, "chosenServer#Failure");
                     else
                     {
