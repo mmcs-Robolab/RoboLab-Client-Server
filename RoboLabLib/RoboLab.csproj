@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CarRobot.cs" />
+    <Compile Include="ControllableMovingRobot.cs" />
     <Compile Include="LegoRobot.cs" />
     <Compile Include="SequentialMovesRobot.cs" />
     <Compile Include="BaseRobot.cs" />

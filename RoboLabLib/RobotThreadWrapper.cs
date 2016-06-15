@@ -82,7 +82,6 @@ namespace RoboLab
                 robot.PrintMessage += Robot_PrintMessage;
                 robot.FellAsleep += Robot_FellAsleep;
                 robot.WokeUp += Robot_WokeUp;
-                robot.Crashed += Robot_Crashed;
             }
         }
 
@@ -114,7 +113,6 @@ namespace RoboLab
                 robot.PrintMessage -= Robot_PrintMessage;
                 robot.FellAsleep -= Robot_FellAsleep;
                 robot.WokeUp -= Robot_WokeUp;
-                robot.Crashed -= Robot_Crashed;
                 //robot.StopRunning();
                 //t.Interrupt();
                 t.Abort();
