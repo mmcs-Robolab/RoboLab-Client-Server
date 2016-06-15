@@ -55,11 +55,7 @@ namespace RoboServer
             socketServer.Disconnected += SocketServer_Disconnected;
             socketServer.MessageReceived += SocketServer_MessageReceived;
             socketServer.MessageSent += SocketServer_MessageSent;
-
-            /*RoboLab.VirtualRobot vr = new RoboLab.VirtualRobot();
-            RoboLab.MovingRobot mr = new RoboLab.SequentialMovesRobot();
-            mr.SetBaseRobot(vr);
-            mr.BeginMoveForward(1);*/
+            
         }
 
         private void SocketServer_MessageSent(object sender, ConnectionEventArgs args)

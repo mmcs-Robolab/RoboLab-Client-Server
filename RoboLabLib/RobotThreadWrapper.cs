@@ -96,14 +96,7 @@ namespace RoboLab
             if(PrintMessage != null)
                 PrintMessage(this, args);
         }
-
-        private void Robot_Crashed(object sender, CrashedEventArgs args)
-        {
-            Exception e = args.Exception.InnerException;
-            Print(e.Source + ": " + e.Message);
-            Finish();
-        }
-
+        
         public void Finish()
         {
             try

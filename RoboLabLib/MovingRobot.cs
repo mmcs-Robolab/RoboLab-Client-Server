@@ -15,12 +15,17 @@ namespace RoboLab
         internal override void SetBaseRobot(BaseRobot baseRobot)
         {
             base.SetBaseRobot(baseRobot);
-            foreach (IMotor m in baseRobot.GetMotors())
+            if (baseRobot != null)
             {
-                if (!motorsByTypes.ContainsKey(m.MotorType))
-                    motorsByTypes[m.MotorType] = new List<IMotor>();
-                motorsByTypes[m.MotorType].Add(m);
+                foreach (IMotor m in baseRobot.GetMotors())
+                {
+                    if (!motorsByTypes.ContainsKey(m.MotorType))
+                        motorsByTypes[m.MotorType] = new List<IMotor>();
+                    motorsByTypes[m.MotorType].Add(m);
+                }
             }
+            else
+                motorsByTypes.Clear();
         }
 
         private void updateMotors()
