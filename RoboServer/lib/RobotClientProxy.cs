@@ -26,6 +26,7 @@ namespace RoboServer.lib
             connection = con;
             dataAccumulator = new RoboLab.DataAccumulator();
             recvBuffer = new byte[1024];
+            
             connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
             dataAccumulator.DataReceived += DataAccumulator_DataReceived;
         }

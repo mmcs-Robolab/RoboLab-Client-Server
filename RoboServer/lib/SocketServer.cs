@@ -102,16 +102,22 @@ namespace RoboServer.lib
             ConnectionInfo clientInfo = GetConnectionBySock(handler);
             if (clientInfo == null)
                 throw new IndexOutOfRangeException("Dead man's letter");
-
-            int bytesRead = handler.EndReceive(ar);
-
-            if(bytesRead > 0)
+            try
             {
-                clientInfo.command += Encoding.UTF8.GetString(clientInfo.buffer, 0, bytesRead);
-                //ProcessCommand(clientInfo);
-                if (MessageReceived != null)
-                    MessageReceived(this, new ConnectionEventArgs(clientInfo));
-                clientInfo.clientSock.BeginReceive(clientInfo.buffer, 0, clientInfo.buffer.Length, 0, new AsyncCallback(ReceiveCallback), handler);
+                int bytesRead = handler.EndReceive(ar);
+
+                if (bytesRead > 0)
+                {
+                    clientInfo.command += Encoding.UTF8.GetString(clientInfo.buffer, 0, bytesRead);
+                    //ProcessCommand(clientInfo);
+                    if (MessageReceived != null)
+                        MessageReceived(this, new ConnectionEventArgs(clientInfo));
+                    clientInfo.clientSock.BeginReceive(clientInfo.buffer, 0, clientInfo.buffer.Length, 0, new AsyncCallback(ReceiveCallback), handler);
+                }
+            }
+            catch(Exception e)
+            {
+                RoboLab.Logger.Log(e.Message, this);
             }
         }
         

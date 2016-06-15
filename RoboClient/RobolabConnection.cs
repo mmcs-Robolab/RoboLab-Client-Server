@@ -120,7 +120,7 @@ namespace RoboClient
             onConnected();
             byte[] receiveBuffer = new byte[1024];
             //  тут начать слушание сервера пока не отключились
-            sClient.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, 0, new AsyncCallback(ReceiveCallback), 0);
+            sClient.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, 0, new AsyncCallback(ReceiveCallback), receiveBuffer);
 
             JObject userInfo = new JObject();
             userInfo.Add("name", pointName);
