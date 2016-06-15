@@ -38,12 +38,20 @@ namespace RoboLab
 
         public IList<IMotor> GetMotors()
         {
-            return baseRobot?.GetMotors() ?? new List<IMotor>().AsReadOnly();
+            if (baseRobot == null)
+                return new List<IMotor>().AsReadOnly();
+            else
+                return baseRobot.GetMotors();
+            //return baseRobot?.GetMotors() ?? new List<IMotor>().AsReadOnly();
         }
 
         public IList<ISensor> GetSensors()
         {
-            return baseRobot?.GetSensors() ?? new List<ISensor>().AsReadOnly();
+            if (baseRobot == null)
+                return new List<ISensor>().AsReadOnly();
+            else
+                return baseRobot.GetSensors();
+            //return baseRobot?.GetSensors() ?? new List<ISensor>().AsReadOnly();
         }
 
         public Robot(BaseRobot baseRobot)
