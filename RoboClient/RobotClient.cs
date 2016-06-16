@@ -51,10 +51,10 @@ namespace RoboClient
                     sendToUser(userID, "robots#" + String.Join("#", dispatcher.GetRobots()));
                     break;
                 case "sendSource":
-                    if (parts.Length < 3)
+                    if (parts.Length < 4)
                         return;
                     
-                    string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(userID), String.Concat(parts.Skip(2)), parts[1]);
+                    string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(userID), String.Concat(parts.Skip(3)), parts[2]);
                     sendToUser(userID, "compilationResult#" + result);
                     Logger.Log(result, this);
                     

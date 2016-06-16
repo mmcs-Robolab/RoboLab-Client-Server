@@ -106,7 +106,7 @@ namespace RoboLab
 
         void Brake();
     }
-
+    
     public class MotorPollResult : PollResult
     {
         public double TachoCount { get; private set; }

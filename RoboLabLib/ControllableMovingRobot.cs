@@ -19,19 +19,15 @@ namespace RoboLab
             switch(args.Message)
             {
                 case "Forward":
-                    Stop();
                     BeginMoveForward(1);
                     break;
                 case "Backward":
-                    Stop();
                     BeginMoveBackward(1);
                     break;
                 case "Left":
-                    Stop();
                     BeginTurnLeft(1);
                     break;
                 case "Right":
-                    Stop();
                     BeginTurnRight(1);
                     break;
                 case "Stop":
