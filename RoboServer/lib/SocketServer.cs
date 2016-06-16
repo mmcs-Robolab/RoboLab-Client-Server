@@ -90,7 +90,7 @@ namespace RoboServer.lib
                 Connected(this, new ConnectionEventArgs(connection));
 
             lock (connection) connections.Add(connection);
-            connection.clientSock.BeginReceive(connection.buffer, 0, connection.buffer.Length, 0, new AsyncCallback(ReceiveCallback), connection.clientSock);
+            //connection.clientSock.BeginReceive(connection.buffer, 0, connection.buffer.Length, 0, new AsyncCallback(ReceiveCallback), connection.clientSock);
 
         }
 

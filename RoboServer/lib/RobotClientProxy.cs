@@ -51,6 +51,7 @@ namespace RoboServer.lib
                 if (bytesRead > 0)
                 {
                     string fullMessage = Encoding.UTF8.GetString(recvBuffer, 0, bytesRead);
+                    RoboLab.Logger.Log("\""+fullMessage + "\" received by " + connection.selfID.ToString());
                     dataAccumulator.AcceptData(fullMessage);
                     connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
                 }
@@ -59,6 +60,7 @@ namespace RoboServer.lib
             {
                 RoboLab.Logger.Log(e.Message, this);
             }
+            connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
         }
 
         private void sendMessage(string message)

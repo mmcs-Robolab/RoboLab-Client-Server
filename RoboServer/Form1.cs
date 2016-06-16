@@ -25,6 +25,12 @@ namespace RoboServer
         public MainForm()
         {
             InitializeComponent();
+            RoboLab.Logger.LogUpdated += Logger_LogUpdated;
+        }
+
+        private void Logger_LogUpdated(object sender, RoboLab.LogUpdateEventArgs e)
+        {
+            logSocketText.AppendText(e.Message);
         }
 
 
