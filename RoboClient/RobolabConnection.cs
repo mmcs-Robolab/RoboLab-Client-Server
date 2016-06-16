@@ -129,8 +129,8 @@ namespace RoboClient
             else
                 userInfo.Add("deviceList", "");*/
 
-            byte[] sendBuffer = Encoding.UTF8.GetBytes("setUserInfo" + "#" + userInfo.ToString() + Environment.NewLine);
-            sClient.BeginSend(sendBuffer, 0, sendBuffer.Length, 0, new AsyncCallback(SendCallback), sClient);
+            //byte[] sendBuffer = Encoding.UTF8.GetBytes("setUserInfo" + "#" + userInfo.ToString() + Environment.NewLine);
+            //sClient.BeginSend(sendBuffer, 0, sendBuffer.Length, 0, new AsyncCallback(SendCallback), sClient);
 
         }
         private void SendCallback(IAsyncResult ar)

@@ -161,6 +161,9 @@ namespace RoboClient
                             return;
                         }
                         break;
+                    case "Dummy":
+                        robot = new DummyRobot();
+                        break;
                 }
                 if (robot != null)
                 {

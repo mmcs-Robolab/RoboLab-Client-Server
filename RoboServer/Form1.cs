@@ -78,8 +78,18 @@ namespace RoboServer
             this.Invoke(()=>
             {
                 appendSockLogBox(args.Connection.selfID + " connected");
-                robotClients[args.Connection.selfID] = new RobotClientProxy(args.Connection);
+                RobotClientProxy rcp = new RobotClientProxy(args.Connection);
+                robotClients[args.Connection.selfID] = rcp;
+                rcp.ReceiveMessage += MainForm_ReceiveMessage;
+                rcp.Disconnected += Rcp_Disconnected;
             });
+        }
+
+        private void Rcp_Disconnected(object sender, DisconnectedEventArgs e)
+        {
+            robotClients.Remove(e.Client.GetID());
+            socketServer.returnId(e.Client.GetID());
+            
         }
 
         private void WebSocketServer_MessageSent(object sender, WebConnectionEventArgs args)
@@ -89,6 +99,13 @@ namespace RoboServer
        
         private IEnumerable<string> getServerList()
         {
+            foreach(IRobotClient rc in robotClients.Values)
+            {
+                RobotClientProxy rcp = rc as RobotClientProxy;
+                //rcp?.CheckConnection();
+                if (rcp != null)
+                    rcp.CheckConnection();
+            }
             return robotClients.Keys.Select(x => x.ToString());
 
         }

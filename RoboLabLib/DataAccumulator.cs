@@ -20,9 +20,14 @@ namespace RoboLab
 
         }
 
-        public void AcceptData(string data)
+        private void checkForMessages()
         {
-            accum = accum + data;
+            if (numLeft == 0)
+            {
+                int ind = accum.IndexOf('#');
+                if (ind != -1 && int.TryParse(accum.Substring(0, ind), out numLeft))
+                    accum = accum.Substring(ind + 1);
+            }
             if (numLeft > 0 && accum.Length >= numLeft)
             {
                 string message = accum.Substring(0, numLeft);
@@ -30,13 +35,14 @@ namespace RoboLab
                 numLeft = 0;
                 if (DataReceived != null)
                     DataReceived(this, new MessageReceivedEventArgs(message));
+                checkForMessages();
             }
-            if (numLeft == 0)
-            {
-                int ind = accum.IndexOf('#');
-                if (ind != -1 && int.TryParse(accum.Substring(0, ind), out numLeft))
-                    accum = accum.Substring(ind + 1);
-            }
+        }
+
+        public void AcceptData(string data)
+        {
+            accum = accum + data;
+            checkForMessages();
         }
     }
     public class MessageReceivedEventArgs : EventArgs

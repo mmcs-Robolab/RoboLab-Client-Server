@@ -46,13 +46,13 @@
             this.button2 = new System.Windows.Forms.Button();
             this.robotsListBox = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.addRobotButton = new System.Windows.Forms.Button();
+            this.robotTypeComboBox = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.robotPortTextBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.robotNameTextBox = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.robotPortTextBox = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.robotTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.addRobotButton = new System.Windows.Forms.Button();
             this.serverPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -237,6 +237,56 @@
             this.panel1.Size = new System.Drawing.Size(208, 117);
             this.panel1.TabIndex = 20;
             // 
+            // addRobotButton
+            // 
+            this.addRobotButton.Location = new System.Drawing.Point(12, 84);
+            this.addRobotButton.Name = "addRobotButton";
+            this.addRobotButton.Size = new System.Drawing.Size(191, 27);
+            this.addRobotButton.TabIndex = 9;
+            this.addRobotButton.Text = "Добавить";
+            this.addRobotButton.UseVisualStyleBackColor = true;
+            this.addRobotButton.Click += new System.EventHandler(this.addRobotButton_Click);
+            // 
+            // robotTypeComboBox
+            // 
+            this.robotTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.robotTypeComboBox.FormattingEnabled = true;
+            this.robotTypeComboBox.Items.AddRange(new object[] {
+            "Lego",
+            "Car",
+            "Dummy"});
+            this.robotTypeComboBox.Location = new System.Drawing.Point(106, 57);
+            this.robotTypeComboBox.Name = "robotTypeComboBox";
+            this.robotTypeComboBox.Size = new System.Drawing.Size(91, 21);
+            this.robotTypeComboBox.TabIndex = 8;
+            this.robotTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 60);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(67, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Тип робота:";
+            // 
+            // robotPortTextBox
+            // 
+            this.robotPortTextBox.Location = new System.Drawing.Point(106, 32);
+            this.robotPortTextBox.Name = "robotPortTextBox";
+            this.robotPortTextBox.Size = new System.Drawing.Size(92, 20);
+            this.robotPortTextBox.TabIndex = 6;
+            this.robotPortTextBox.Text = "COM1";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(9, 35);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "Порт:";
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -253,55 +303,6 @@
             this.robotNameTextBox.Size = new System.Drawing.Size(92, 20);
             this.robotNameTextBox.TabIndex = 3;
             this.robotNameTextBox.Text = "NewRobot";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(9, 35);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "Порт:";
-            // 
-            // robotPortTextBox
-            // 
-            this.robotPortTextBox.Location = new System.Drawing.Point(106, 32);
-            this.robotPortTextBox.Name = "robotPortTextBox";
-            this.robotPortTextBox.Size = new System.Drawing.Size(92, 20);
-            this.robotPortTextBox.TabIndex = 6;
-            this.robotPortTextBox.Text = "COM1";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 60);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(67, 13);
-            this.label5.TabIndex = 7;
-            this.label5.Text = "Тип робота:";
-            // 
-            // robotTypeComboBox
-            // 
-            this.robotTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.robotTypeComboBox.FormattingEnabled = true;
-            this.robotTypeComboBox.Items.AddRange(new object[] {
-            "Lego",
-            "Car"});
-            this.robotTypeComboBox.Location = new System.Drawing.Point(106, 57);
-            this.robotTypeComboBox.Name = "robotTypeComboBox";
-            this.robotTypeComboBox.Size = new System.Drawing.Size(91, 21);
-            this.robotTypeComboBox.TabIndex = 8;
-            this.robotTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            // 
-            // addRobotButton
-            // 
-            this.addRobotButton.Location = new System.Drawing.Point(12, 84);
-            this.addRobotButton.Name = "addRobotButton";
-            this.addRobotButton.Size = new System.Drawing.Size(191, 27);
-            this.addRobotButton.TabIndex = 9;
-            this.addRobotButton.Text = "Добавить";
-            this.addRobotButton.UseVisualStyleBackColor = true;
-            this.addRobotButton.Click += new System.EventHandler(this.addRobotButton_Click);
             // 
             // Form1
             // 

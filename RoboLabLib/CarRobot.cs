@@ -21,6 +21,8 @@ namespace RoboLab
 
         public CarRobot(string portName)
         {
+            IsConnected = false;
+            port = new SerialPort();
             port.DataReceived += Port_DataReceived;
             OpenConnection(portName);
         }

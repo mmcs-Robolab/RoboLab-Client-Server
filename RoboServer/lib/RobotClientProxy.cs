@@ -14,6 +14,8 @@ namespace RoboServer.lib
         byte[] recvBuffer;
         RoboLab.DataAccumulator dataAccumulator;
 
+        public event DisconnectedHandler Disconnected;
+
         public SortedSet<int> Users
         {
             get;
@@ -61,9 +63,13 @@ namespace RoboServer.lib
 
         private void sendMessage(string message)
         {
-            string msg = message.Length.ToString() + "#" + message;
-            byte[] bytes = Encoding.UTF8.GetBytes(msg);
-            connection.clientSock.BeginSend(bytes, 0, bytes.Length, System.Net.Sockets.SocketFlags.None, new AsyncCallback(EndSendCallback), connection.clientSock);
+            CheckConnection();
+            if (IsConnected())
+            {
+                string msg = message.Length.ToString() + "#" + message;
+                byte[] bytes = Encoding.UTF8.GetBytes(msg);
+                connection.clientSock.BeginSend(bytes, 0, bytes.Length, System.Net.Sockets.SocketFlags.None, new AsyncCallback(EndSendCallback), connection.clientSock);
+            }
         }
 
         private void EndSendCallback(IAsyncResult ar)
@@ -96,5 +102,33 @@ namespace RoboServer.lib
             sendMessage("sendSource#" + UserID.ToString() + "#" + MainClass+"#"+Source);
             
         }
+
+        public void CheckConnection()
+        {
+            if (!IsConnected() && Disconnected != null)
+                Disconnected(this, new DisconnectedEventArgs(this));
+        }
+
+        public bool IsConnected()
+        {
+            return connection.clientSock.Connected;
+        }
+
+        public int GetID()
+        {
+            return connection.selfID;
+        }
     }
+
+    internal class DisconnectedEventArgs : EventArgs
+    {
+        public RobotClientProxy Client { get; private set; }
+
+        public DisconnectedEventArgs(RobotClientProxy client)
+        {
+            Client = client;
+        }
+    }
+
+    internal delegate void DisconnectedHandler(object sender, DisconnectedEventArgs e);
 }
