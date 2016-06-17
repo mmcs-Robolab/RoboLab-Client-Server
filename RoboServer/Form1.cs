@@ -30,7 +30,7 @@ namespace RoboServer
 
         private void Logger_LogUpdated(object sender, RoboLab.LogUpdateEventArgs e)
         {
-            logSocketText.AppendText(e.Message);
+            this.Invoke(()=>logSocketText.AppendText(e.Message));
         }
 
 
@@ -159,7 +159,12 @@ namespace RoboServer
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
                         webSocketServer.MessageUser(userID, "bindingResult#Failure");
                     else
+                    {
                         robotClients[userBindings[userID]].BindUserRobot(userID, messageParts[1]);
+                        RobotClientProxy rcp = robotClients[userBindings[userID]] as RobotClientProxy;
+                        if (rcp != null)
+                            webSocketServer.MessageUser(userID, "videoStream#" + rcp.StreamURL);
+                    }
                     break;
                 case "messageRobot":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
@@ -185,6 +190,13 @@ namespace RoboServer
                     else
                         (robotClients[userBindings[userID]] as VirtualClient).StartSimulation();
                     break;
+                case "manualControl":
+                    if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]))
+                        webSocketServer.MessageUser(userID, "manualControl#Failure");
+                    else
+                        robotClients[userBindings[userID]].ManualControl(userID);
+                    break;
+
             }
         }
 
@@ -206,6 +218,7 @@ namespace RoboServer
 
         private void WebSocketServer_Disconnected(object sender, WebConnectionEventArgs args)
         {
+            robotClients[args.Connection.userID].UnbindUser(args.Connection.userID);
             this.Invoke(()=>appendWebSockLogBox(args.Connection.userID + " disconnected"));
         }
 

@@ -13,11 +13,15 @@ namespace RoboServer.lib
 
         void BindUserRobot(int UserID, string Robot);
 
+        void UnbindUser(int UserID);
+
         void SendSource(int UserID, string Source, string MainClass);
 
         void CommandRobot(int UserID, string Command);
 
         void GetRobots(int UserID);
+
+        void ManualControl(int UserID);
 
         event ReceiveMessagehandler ReceiveMessage;
     }

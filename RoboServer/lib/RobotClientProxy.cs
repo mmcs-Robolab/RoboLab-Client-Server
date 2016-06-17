@@ -16,6 +16,7 @@ namespace RoboServer.lib
 
         public event DisconnectedHandler Disconnected;
 
+        public string StreamURL { get; private set; }
         public SortedSet<int> Users
         {
             get;
@@ -28,18 +29,31 @@ namespace RoboServer.lib
             connection = con;
             dataAccumulator = new RoboLab.DataAccumulator();
             recvBuffer = new byte[1024];
-            
+            StreamURL = "";
             connection.clientSock.BeginReceive(recvBuffer, 0, 1024, System.Net.Sockets.SocketFlags.None, new AsyncCallback(receiveCallback), connection.clientSock);
             dataAccumulator.DataReceived += DataAccumulator_DataReceived;
         }
-
+        private void onReceiveMessage(int userID, string message)
+        {
+            if (ReceiveMessage != null)
+                ReceiveMessage(this, new MessageEventArgs(userID, message));
+        }
         private void DataAccumulator_DataReceived(object sender, RoboLab.MessageReceivedEventArgs e)
         {
             string[] parts = e.Message.Split('#');
             int userID;
             if (parts.Length >= 2 && int.TryParse(parts[0], out userID))
-                if (ReceiveMessage != null)
-                    ReceiveMessage(this, new MessageEventArgs(userID, String.Join("#", parts.Skip(1))));
+            {
+                if (userID != -1)
+                    onReceiveMessage(userID, String.Join("#", parts.Skip(1)));
+                else
+                {
+                    foreach (int user in Users)
+                        onReceiveMessage(user, String.Join("#", parts.Skip(1)));
+                    if (parts[1] == "videoStream")
+                        StreamURL = String.Join("#", parts.Skip(2));
+                }
+            }
         }
 
         private void receiveCallback(IAsyncResult ar)
@@ -81,11 +95,13 @@ namespace RoboServer.lib
 
         public void BindUserRobot(int UserID, string Robot)
         {
+            Users.Add(UserID);
             sendMessage("bindUser#" + UserID.ToString() + "#" + Robot);
         }
 
         public void UnbindUser(int UserID)
         {
+            Users.Remove(UserID);
             sendMessage("unbindUser#" + UserID.ToString());
         }
 
@@ -119,6 +135,11 @@ namespace RoboServer.lib
         public int GetID()
         {
             return connection.selfID;
+        }
+
+        public void ManualControl(int UserID)
+        {
+            sendMessage("manualControl#" + UserID.ToString());
         }
     }
 

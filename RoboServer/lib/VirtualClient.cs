@@ -97,5 +97,16 @@ namespace RoboServer.lib
             foreach (string robot in dispatcher.GetRobots().ToArray())
                 dispatcher.StopRobot(robot);
         }
+
+        public void ManualControl(int UserID)
+        {
+            dispatcher.ManualControl(UserID);
+        }
+
+        public void UnbindUser(int UserID)
+        {
+            Users.Remove(UserID);
+            dispatcher.UnbindUser(UserID);
+        }
     }
 }

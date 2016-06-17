@@ -74,7 +74,13 @@ namespace RoboLab
             return true;
         }
 
-        
+        public string ManualControl(int userID)
+        {
+            if (!usersRobots.ContainsKey(userID))
+                return "Failure";
+            
+            return RunRobot(usersRobots[userID], typeof(ControllableMovingRobot), true);
+        }
 
         public string RunRobot(String name, Type RobotType, bool trusted = false)
         {
@@ -108,24 +114,26 @@ namespace RoboLab
         {
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             //if(robots[name].Robot != null)
-            //robots[name].Finish();
-            
-            AppDomain appDomain = AppDomain.CreateDomain(name);
+            robots[name].Finish();
+            PermissionSet permSet = new PermissionSet(PermissionState.None);
+            permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
+            Evidence ev = new Evidence();
+            ev.AddHostEvidence(new Zone(SecurityZone.Untrusted));
+            AppDomainSetup adSetup = new AppDomainSetup();
+            AppDomain appDomain = AppDomain.CreateDomain(name, ev, adSetup, permSet);
 
             robots[name] = (RobotThreadWrapper)appDomain.CreateInstanceAndUnwrap(
                 Assembly.GetAssembly(typeof(Robot)).FullName,
                 "RoboLab.RobotThreadWrapper");
-            robots[name].PrintMessage += Robot_PrintMessage;
+
             robots[name].Name = name;
+            robots[name].PrintMessage += Robot_PrintMessage;
             string s = robots[name].SetBaseRobot(source, mainClass, baseRobot);
             Logger.Log(s);
             if (s == "Success")
             {
                 robots[name].RunRobotAsync();
-
-                //Test only
-                //robots[name].GetBaseRobot().BeginGetSensorValue(SensorType.Odometry);
-                //System.Environment.StackTrace
+                
             }
             else
                 robots[name].SetBaseRobot(typeof(Robot), baseRobot);
@@ -147,9 +155,8 @@ namespace RoboLab
         {
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             robots[name].Finish();
-            if(!robots[name].Trusted)
-                AppDomain.Unload(robots[name].GetAppDomain());
             robots[name] = new RobotThreadWrapper();
+            robots[name].Name = name;
             robots[name].PrintMessage += Robot_PrintMessage;
             robots[name].SetBaseRobot(typeof(Robot), baseRobot);
         }

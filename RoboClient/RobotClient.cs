@@ -37,9 +37,9 @@ namespace RoboClient
             {
                 case "bindUser":
                     if (dispatcher.BindUser(userID, parts[2]))
-                        sendToUser(userID, "bindingResult#Success");
+                        SendToUser(userID, "bindingResult#Success");
                     else
-                        sendToUser(userID, "bindingResult#Failure");
+                        SendToUser(userID, "bindingResult#Failure");
                     break;
                 case "unbindUser":
                     dispatcher.UnbindUser(userID);
@@ -48,26 +48,29 @@ namespace RoboClient
                     dispatcher.GetUserRobot(userID).Receive(String.Join("#", parts.Skip(2)));
                     break;
                 case "sendRobots":
-                    sendToUser(userID, "robots#" + String.Join("#", dispatcher.GetRobots()));
+                    SendToUser(userID, "robots#" + String.Join("#", dispatcher.GetRobots()));
                     break;
                 case "sendSource":
                     if (parts.Length < 4)
                         return;
                     
                     string result = dispatcher.RunRobot(dispatcher.GetUserRobotName(userID), String.Concat(parts.Skip(3)), parts[2]);
-                    sendToUser(userID, "compilationResult#" + result);
+                    SendToUser(userID, "compilationResult#" + result);
                     Logger.Log(result, this);
                     
+                    break;
+                case "manualControl":
+                    dispatcher.ManualControl(userID);
                     break;
             }
         }
 
         private void Dispatcher_DispatcherPrint(object sender, DispatcherPrintEventArgs args)
         {
-            sendToUser(args.UserID, "messageFromRobot#"+args.Message);
+            SendToUser(args.UserID, "messageFromRobot#"+args.Message);
         }
 
-        private void sendToUser(int UserID, string message)
+        public void SendToUser(int UserID, string message)
         {
             string fullMessage = UserID.ToString() + "#" + message;
             Connection.Send(fullMessage.Length.ToString() + "#" + fullMessage);

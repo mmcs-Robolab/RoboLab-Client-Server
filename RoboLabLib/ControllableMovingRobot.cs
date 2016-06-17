@@ -16,6 +16,7 @@ namespace RoboLab
 
         private void ControllableMovingRobot_ReceiveMessage(object sender, ReceiveEventArgs args)
         {
+            //Print(args.Message);
             switch(args.Message)
             {
                 case "Forward":

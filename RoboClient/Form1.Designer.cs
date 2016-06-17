@@ -53,6 +53,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.robotNameTextBox = new System.Windows.Forms.TextBox();
+            this.streamTextBox = new System.Windows.Forms.TextBox();
+            this.sendStreamButton = new System.Windows.Forms.Button();
             this.serverPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -218,7 +220,7 @@
             this.robotsListBox.FormattingEnabled = true;
             this.robotsListBox.Location = new System.Drawing.Point(425, 311);
             this.robotsListBox.Name = "robotsListBox";
-            this.robotsListBox.Size = new System.Drawing.Size(209, 121);
+            this.robotsListBox.Size = new System.Drawing.Size(209, 95);
             this.robotsListBox.TabIndex = 19;
             // 
             // panel1
@@ -304,6 +306,28 @@
             this.robotNameTextBox.TabIndex = 3;
             this.robotNameTextBox.Text = "NewRobot";
             // 
+            // streamTextBox
+            // 
+            this.streamTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.streamTextBox.Location = new System.Drawing.Point(425, 412);
+            this.streamTextBox.Name = "streamTextBox";
+            this.streamTextBox.Size = new System.Drawing.Size(101, 20);
+            this.streamTextBox.TabIndex = 12;
+            this.streamTextBox.Text = "url трансляции";
+            // 
+            // sendStreamButton
+            // 
+            this.sendStreamButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.sendStreamButton.Enabled = false;
+            this.sendStreamButton.Location = new System.Drawing.Point(532, 412);
+            this.sendStreamButton.Name = "sendStreamButton";
+            this.sendStreamButton.Size = new System.Drawing.Size(102, 20);
+            this.sendStreamButton.TabIndex = 10;
+            this.sendStreamButton.Text = "Отправить адрес трансляции";
+            this.sendStreamButton.UseVisualStyleBackColor = true;
+            this.sendStreamButton.Click += new System.EventHandler(this.sendStreamButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -317,8 +341,10 @@
             this.Controls.Add(this.nameText);
             this.Controls.Add(this.nameLabel);
             this.Controls.Add(this.serverPanel);
+            this.Controls.Add(this.streamTextBox);
             this.Controls.Add(this.msgField);
             this.Controls.Add(this.logText);
+            this.Controls.Add(this.sendStreamButton);
             this.Controls.Add(this.button2);
             this.MinimumSize = new System.Drawing.Size(590, 250);
             this.Name = "Form1";
@@ -360,6 +386,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox robotNameTextBox;
         private System.Windows.Forms.Button addRobotButton;
+        private System.Windows.Forms.TextBox streamTextBox;
+        private System.Windows.Forms.Button sendStreamButton;
     }
 }
 

@@ -173,6 +173,10 @@ namespace RoboClient
             }
 
         }
-        
+
+        private void sendStreamButton_Click(object sender, EventArgs e)
+        {
+            client.SendToUser(-1, "videoStream#" + streamTextBox.Text);
+        }
     }
 }
