@@ -135,6 +135,9 @@ namespace RoboServer
                         userBindings[userID] = server;
                         robotClients[server].Users.Add(userID);
                         webSocketServer.MessageUser(userID, "chosenServer#Success");
+                        RobotClientProxy rcp = robotClients[server] as RobotClientProxy;
+                        if (rcp != null)
+                            webSocketServer.MessageUser(userID, "videoStream#" + rcp.StreamURL);
                     }
                     break;
                 case "createSimulation":
@@ -159,12 +162,8 @@ namespace RoboServer
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)
                         webSocketServer.MessageUser(userID, "bindingResult#Failure");
                     else
-                    {
                         robotClients[userBindings[userID]].BindUserRobot(userID, messageParts[1]);
-                        RobotClientProxy rcp = robotClients[userBindings[userID]] as RobotClientProxy;
-                        if (rcp != null)
-                            webSocketServer.MessageUser(userID, "videoStream#" + rcp.StreamURL);
-                    }
+                        
                     break;
                 case "messageRobot":
                     if (!userBindings.ContainsKey(userID) || !robotClients.ContainsKey(userBindings[userID]) || messageParts.Length < 2)

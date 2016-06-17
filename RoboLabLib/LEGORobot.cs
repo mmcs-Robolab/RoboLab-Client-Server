@@ -27,8 +27,15 @@ namespace RoboLab
 
         public bool Connect()
         {
-            brick.Connect();
-            return brick.IsConnected;
+            try
+            {
+                brick.Connect();
+                return brick.IsConnected;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
         }
 
         public void AddMotor(MotorPort port, LogicalMotorType motorTypes)
@@ -64,7 +71,7 @@ namespace RoboLab
             motors.Add(motorSteer);
         }
     }
-    public class MotorSync
+    public class MotorSync : MarshalByRefObject
     {
         NxtMotorSync motorSync;
         public double TurnRatio
@@ -139,7 +146,7 @@ namespace RoboLab
             motorSync.Run(power, motorSync.TurnRatio);
         }
     }
-    public class LegoMotorPairSteer : IMotor
+    public class LegoMotorPairSteer : MarshalByRefObject, IMotor
     {
         MotorSync motorSync;
         public LegoMotorPairSteer(MotorSync motorSync, LogicalMotorType type)
@@ -162,7 +169,7 @@ namespace RoboLab
                 motorSync.Brake();
         }
     }
-    public class LegoMotor : IMotor, IPollable
+    public class LegoMotor : MarshalByRefObject, IMotor, IPollable
     {
         NxtMotor motor;
         public LogicalMotorType MotorType { get; private set; }

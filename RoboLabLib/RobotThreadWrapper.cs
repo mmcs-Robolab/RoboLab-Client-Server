@@ -101,6 +101,7 @@ namespace RoboLab
         {
             try
             {
+                stopBaseRobot(robot.GetBaseRobot());
                 robot.SetBaseRobot(null);
 
                 robot.PrintMessage -= Robot_PrintMessage;
@@ -130,6 +131,19 @@ namespace RoboLab
                         Print(ee.Message);
                 }
             }
+        }
+
+        private void stopBaseRobot(BaseRobot baseRobot)
+        {
+            foreach (IMotor m in baseRobot.GetMotors())
+            {
+                m.Brake();
+                IPollable ip = m as IPollable;
+                if (ip != null)
+                    ip.PollInterval = 0;
+            }
+            foreach (ISensor s in baseRobot.GetSensors())
+                s.PollInterval = 0;
         }
 
         private void Robot_WokeUp(object sender, SleepEventArgs args)

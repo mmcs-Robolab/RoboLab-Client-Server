@@ -51,7 +51,11 @@ namespace RoboClient
 
         private void Connection_Connected(object sender, EventArgs e)
         {
-            
+            this.Invoke(() =>
+            {
+                sendStreamButton.Enabled = true;
+                button2.Enabled = true;
+            });
         }
 
         private void Connection_Authorised(object sender, EventArgs e)
@@ -144,7 +148,7 @@ namespace RoboClient
                 {
                     case "Lego":
                         LegoRobot legoRobot = new LegoRobot(robotPortTextBox.Text);
-                        legoRobot.AddMotorPair(LegoRobot.MotorPort.PortA, LegoRobot.MotorPort.PortB);
+                        legoRobot.AddMotorPair(LegoRobot.MotorPort.PortA, LegoRobot.MotorPort.PortC);
                         if(!legoRobot.Connect())
                         {
                             MessageBox.Show("Не удалось подключиться к роботу!");

@@ -115,13 +115,17 @@ namespace RoboLab
             BaseRobot baseRobot = robots[name].GetBaseRobot();
             //if(robots[name].Robot != null)
             robots[name].Finish();
-            PermissionSet permSet = new PermissionSet(PermissionState.None);
+            /*PermissionSet permSet = new PermissionSet(PermissionState.None);
             permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
+            //permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.));
+
             Evidence ev = new Evidence();
             ev.AddHostEvidence(new Zone(SecurityZone.Untrusted));
+            
             AppDomainSetup adSetup = new AppDomainSetup();
-            AppDomain appDomain = AppDomain.CreateDomain(name, ev, adSetup, permSet);
-
+            adSetup.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
+            AppDomain appDomain = AppDomain.CreateDomain(name, ev, adSetup, permSet);*/
+            AppDomain appDomain = AppDomain.CreateDomain(name);
             robots[name] = (RobotThreadWrapper)appDomain.CreateInstanceAndUnwrap(
                 Assembly.GetAssembly(typeof(Robot)).FullName,
                 "RoboLab.RobotThreadWrapper");
