@@ -49,9 +49,14 @@ namespace RoboServer.lib
 
         private void UpdateTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            string message = "simulationPoints#"+ string.Join("#", simulation.getPoints().Select(p => string.Format("{0}#{1}#{2}#{3}#{4}", p.point.x, p.point.y, p.point.z, p.moveType, p.angle)));
-            foreach (int user in Users)
-                onReceiveMessage(user, message);
+            List<SimulationController.PosPoint> points = simulation.getPoints();
+            simulation.clearPoints();
+            if (points.Count > 0)
+            {
+                string message = "simulationPoints#" + string.Join("#", points.Select(p => string.Format("{0}#{1}#{2}#{3}#{4}", p.point.x, p.point.y, p.point.z, p.moveType, p.angle)));
+                foreach (int user in Users)
+                    onReceiveMessage(user, message);
+            }
         }
 
         private void Dispatcher_DispatcherPrint(object sender, DispatcherPrintEventArgs args)
