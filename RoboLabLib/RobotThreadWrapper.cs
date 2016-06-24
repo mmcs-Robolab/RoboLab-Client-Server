@@ -116,8 +116,12 @@ namespace RoboLab
                 robot.WokeUp -= Robot_WokeUp;
                 //robot.StopRunning();
                 //t.Interrupt();
-                t.Abort();
-                t.Join();
+                if (t != null)
+                {
+                    t.Abort();
+                    
+                    //t.Join();
+                }
             }
             catch (Exception ee)
             {

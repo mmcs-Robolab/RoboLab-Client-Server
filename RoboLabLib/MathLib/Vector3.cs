@@ -46,6 +46,19 @@ namespace RoboLab.MathLib
             this.z += vec.z;
         }
 
+        public double length()
+        {
+            return Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        public void normalize()
+        {
+            double l = length();
+            x /= l;
+            y /= l;
+            z /= l;
+        }
+
         public bool isNull()
         {
             return x == 0 && y == 0 && z == 0;
@@ -64,6 +77,12 @@ namespace RoboLab.MathLib
         public Vector3 Clone()
         {
             return new Vector3(x, y, z);
+        }
+
+        public static double Distance(Vector3 vec1, Vector3 vec2)
+        {
+            Vector3 v = new Vector3(vec2.x - vec1.x, vec2.y - vec1.y, vec2.z - vec1.z);
+            return v.length();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace RoboLab
         private List<PosPoint> pointList = new List<PosPoint>();
 
         private Vector3 oldDirection = new Vector3();
-        
+        private Vector3 lastPos = new Vector3();
         // Scene
         private List<Barrier> barrierList;
         private Plane plane;
@@ -78,7 +78,7 @@ namespace RoboLab
                     vm.SimulationTick();
             }
             robot.direction.rotateOnY(robot.lateralVelocity);
-            
+            robot.direction.normalize();
             Vector3 v = robot.direction.Clone();
             v.multiplyScalar(robot.velocity);
             robot.position.add(v);
@@ -98,7 +98,7 @@ namespace RoboLab
 
         public void saveCurPosition()
         {
-            if (robot.position.isDifferentDirection(oldDirection))
+            if (robot.direction.isDifferentDirection(oldDirection) || Vector3.Distance(robot.position, lastPos) > 10)
             {
                 string moveType;
 
@@ -114,13 +114,12 @@ namespace RoboLab
                 PosPoint point = new PosPoint();
                 point.moveType = moveType;
                 point.point = robot.position;
-
+                
                 pointList.Add(point);
 
-                oldDirection = robot.position;
+                oldDirection = robot.direction.Clone();
+                lastPos = robot.position.Clone();
             }
-
-
         }
 
         public void importSceneFromJson(String json)
