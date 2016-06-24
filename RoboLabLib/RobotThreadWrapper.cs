@@ -87,8 +87,15 @@ namespace RoboLab
 
         private void Print(string message)
         {
-            if (PrintMessage != null)
-                PrintMessage(this, new PrintEventArgs(message));
+            try
+            {
+                if (PrintMessage != null)
+                    PrintMessage(this, new PrintEventArgs(message));
+            }
+            catch(Exception e)
+            {
+                Logger.Log(e.Message);
+            }
         }
 
         private void Robot_PrintMessage(object sender, PrintEventArgs args)

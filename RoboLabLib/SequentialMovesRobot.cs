@@ -41,35 +41,6 @@ namespace RoboLab
                 ActionCompleted(this, e);
         }
 
-        public override void BeginMoveForward(double power, double turnRatio = 0)
-        {
-            StopCurrentAction();
-            actionQueue.Clear();
-            base.BeginMoveForward(power, turnRatio);
-        }
-
-        public override void BeginMoveBackward(double power, double turnRatio = 0)
-        {
-            StopCurrentAction();
-            actionQueue.Clear();
-            base.BeginMoveBackward(power, turnRatio);
-        }
-
-        public override void BeginTurnRight(double power)
-        {
-            StopCurrentAction();
-            actionQueue.Clear();
-            base.BeginTurnRight(power);
-        }
-
-        public override void BeginTurnLeft(double power)
-        {
-            StopCurrentAction();
-            actionQueue.Clear();
-            base.BeginTurnLeft(power);
-        }
-        
-
         public void EnqueueMoveForward(double tachoLimit, double power, double turnRatio = 0)
         {
             StartAction(new MoveAction(tachoLimit, power, turnRatio));

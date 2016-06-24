@@ -30,7 +30,7 @@ namespace RoboServer
 
         private void Logger_LogUpdated(object sender, RoboLab.LogUpdateEventArgs e)
         {
-            this.Invoke(()=>logSocketText.AppendText(e.Message));
+            this.Invoke(()=>logSocketText.AppendText(e.Message+Environment.NewLine));
         }
 
 

@@ -108,7 +108,7 @@ namespace RoboLab
     {
         public VirtualLateralMotor(VirtualRobot robot) : base(robot)
         {
-            this.MotorType = LogicalMotorType.Right;
+            this.MotorType = LogicalMotorType.Steer;
         }
 
         public override void Brake()
