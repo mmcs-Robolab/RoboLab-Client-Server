@@ -26,6 +26,17 @@ namespace RoboLab.MathLib
             this.z = z;
         }
 
+        public static double dot(Vector3 a, Vector3 b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
+        public static double getAngleBetweenVectors(Vector3 a, Vector3 b)
+        {
+            double cos = Vector3.dot(a, b);
+            return Math.Acos(cos);
+        }
+
         public void multiplyScalar(double mult)
         {
             this.x *= mult;

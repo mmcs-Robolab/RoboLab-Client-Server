@@ -21,6 +21,7 @@ namespace RoboLab
         {
             public Vector3 point;
             public string moveType;
+            public double angle;
         }
 
         private List<PosPoint> pointList = new List<PosPoint>();
@@ -100,6 +101,8 @@ namespace RoboLab
         {
             if (robot.direction.isDifferentDirection(oldDirection) || Vector3.Distance(robot.position, lastPos) > 10)
             {
+                PosPoint point = new PosPoint();
+
                 string moveType;
 
                 if (robot.velocity < 0)//robot.velocity.isReverseDirection(robot.direction))
@@ -111,7 +114,22 @@ namespace RoboLab
                     moveType = "forward";
                 }
 
-                PosPoint point = new PosPoint();
+                if (Vector3.Distance(robot.position, lastPos) == 0)
+                {
+                    if (robot.lateralVelocity > 0)
+                    {
+                        moveType = "turnRight";
+                    }
+                    else if(robot.lateralVelocity < 0)
+                    {
+                        moveType = "turnLeft";
+                    }
+
+                    point.angle = Vector3.getAngleBetweenVectors(robot.direction, oldDirection);
+                }
+
+
+                
                 point.moveType = moveType;
                 point.point = robot.position;
                 
