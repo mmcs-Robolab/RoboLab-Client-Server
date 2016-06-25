@@ -126,7 +126,7 @@ namespace RoboLab
 
         public override void Run(double power)
         {
-            robot.lateralVelocity = -power;
+            robot.lateralVelocity = 0.1 * power;
         }
 
         internal override void SimulationTick()
