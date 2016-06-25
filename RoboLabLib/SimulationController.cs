@@ -103,13 +103,13 @@ namespace RoboLab
             {
                 PosPoint point = new PosPoint();
 
-                string moveType;
+                string moveType = "";
 
                 if (robot.velocity < 0)//robot.velocity.isReverseDirection(robot.direction))
                 {
                     moveType = "backward";
                 }
-                else
+                else if (robot.velocity > 0)
                 {
                     moveType = "forward";
                 }
@@ -128,15 +128,18 @@ namespace RoboLab
                     point.angle = Vector3.getAngleBetweenVectors(robot.direction, oldDirection);
                 }
 
+                if (moveType != "")
+                {
+                    point.moveType = moveType;
+                    point.point = robot.position;
 
-                
-                point.moveType = moveType;
-                point.point = robot.position;
-                
-                pointList.Add(point);
+                    pointList.Add(point);
 
-                oldDirection = robot.direction.Clone();
-                lastPos = robot.position.Clone();
+                    oldDirection = robot.direction.Clone();
+                    lastPos = robot.position.Clone();
+                }
+                
+
             }
         }
 
