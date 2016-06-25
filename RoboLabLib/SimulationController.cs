@@ -53,6 +53,8 @@ namespace RoboLab
 
         public void StartSimulation()
         {
+            oldDirection = robot.direction.Clone();
+            lastPos = robot.position.Clone();
             aTimer = new System.Timers.Timer(100);
             aTimer.Elapsed += gameLoop;
             aTimer.AutoReset = true;
@@ -78,8 +80,11 @@ namespace RoboLab
                 if (vm != null)
                     vm.SimulationTick();
             }
-            robot.direction.rotateOnY(robot.lateralVelocity);
-            robot.direction.normalize();
+            if (robot.lateralVelocity != 0)
+            {
+                robot.direction.rotateOnY(robot.lateralVelocity);
+                robot.direction.normalize();
+            }
             Vector3 v = robot.direction.Clone();
             v.multiplyScalar(robot.velocity);
             robot.position.add(v);
@@ -114,7 +119,7 @@ namespace RoboLab
                     moveType = "forward";
                 }
 
-                if (Vector3.Distance(robot.position, lastPos) == 0)
+                if (Vector3.Distance(robot.position, lastPos) < 0.001)
                 {
                     if (robot.lateralVelocity > 0)
                     {
